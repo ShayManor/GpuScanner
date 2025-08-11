@@ -42,7 +42,7 @@ type Getter func() ([]GPU, error)
 
 func (g GPU) toString() string {
 	return fmt.Sprintf("GPU Details:\n"+
-		"ID: %d\n"+
+		"ID: %s\n"+
 		"Name: %s\n"+
 		"Location: %s\n"+
 		"Total GPUs: %d\n"+
@@ -64,7 +64,8 @@ func (g GPU) toString() string {
 		"  GPU: $%.2f\n"+
 		"  Disk: $%.4f\n"+
 		"  Upload: $%.6f\n"+
-		"  Download: $%.6f",
+		"  Download: $%.6f"+
+		"\nSource: %s",
 		g.id,
 		g.name,
 		g.location,
@@ -90,5 +91,6 @@ func (g GPU) toString() string {
 		g.diskCostPH,
 		g.uploadCostPH,
 		g.downloadCostPH,
+		g.source,
 	)
 }
