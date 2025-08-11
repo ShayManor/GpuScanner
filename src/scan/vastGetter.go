@@ -10,26 +10,44 @@ type Response struct {
 	Offers []offer `json:"offers"`
 }
 
+type Search struct {
+	GpuCostPerHour float64 `json:"gpuCostPerHour"`
+	DiskHour       float64 `json:"diskHour"`
+	TotalHour      float64 `json:"totalHour"`
+}
+
 type offer struct {
-	ID        int64   `json:"id"`
-	GPUName   string  `json:"gpu_name"`
-	NumGPUs   int     `json:"num_gpus"`
-	GPURAM    int     `json:"gpu_ram"`
-	DPHTotal  float64 `json:"dph_total"`
-	Verified  bool    `json:"verified"`
-	Rentable  bool    `json:"rentable"`
-	MachineID int64   `json:"machine_id"`
-}
-
-type search struct {
-	Cost string `json:"gpuCostPerHour"`
-}
-
-type vastGpuJson struct {
-	Id   string `json:"id" mapstructure:"id"`
-	Name int    `json:"gpu_name" mapstructure:"name"`
-	Ram  string `json:"diskHour" mapstructure:"ram"`
-	//Cost search `json:"search" mapstructure:"float64"`
+	ID               int64   `json:"id"`
+	GPUName          string  `json:"gpu_name"`
+	CPUCores         float64 `json:"cpu_cores"`
+	NumGPUs          int     `json:"num_gpus"`
+	Vram             int     `json:"gpu_ram"`
+	Ram              int     `json:"cpu_ram"`
+	DPHTotal         float64 `json:"discounted_dph_total"`
+	Verified         bool    `json:"verified"`
+	Rentable         bool    `json:"rentable"`
+	Location         string  `json:"geolocation"`
+	Reliability      float64 `json:"reliability"`
+	Duration         float64 `json:"duration"`
+	Flops            float64 `json:"total_flops"`
+	Lanes            int     `json:"gpu_lanes"`
+	MemoryBandwith   float64 `json:"gpu_mem_bw"`
+	Architecture     string  `json:"gpu_arch"`
+	CPUName          string  `json:"cpu_name"`
+	CPUGhz           float64 `json:"cpu_ghz"`
+	CPUArch          string  `json:"cpu_arch"`
+	ComputeCap       int     `json:"compute_cap"`
+	DiskSpace        float64 `json:"disk_space"`
+	DiskBandwith     float64 `json:"disk_bw"`
+	DiskName         string  `json:"disk_name"`
+	Upload           float64 `json:"inet_up"`
+	Download         float64 `json:"inet_down"`
+	GPUCostPH        float64 `json:"gpu_cost_ph"`
+	DiskCostPH       float64 `json:"disk_cost_ph"`
+	UploadCost       float64 `json:"inet_up_cost"`
+	DownloadCost     float64 `json:"inet_down_cost"`
+	FlopsPerDollarPH float64 `json:"flops_per_dphtotal"`
+	Search           Search  `json:"search"`
 }
 
 func vastGetter() ([]GPU, error) {
@@ -49,12 +67,44 @@ func vastGetter() ([]GPU, error) {
 	// Project to your lean slice.
 	out := make([]GPU, 0, len(sr.Offers))
 	for _, o := range sr.Offers {
-		out = append(out, GPU{
-			id:   o.ID,
-			name: o.GPUName,
-			ram:  o.GPURAM,
-			cost: o.DPHTotal,
-		})
+		if o.Rentable {
+			out = append(out, GPU{
+				id:          o.ID,
+				location:    o.Location,
+				reliability: o.Reliability,
+				duration:    o.Duration,
+
+				name:              o.GPUName,
+				vram:              o.Vram,
+				totalFlops:        o.Flops,
+				gpuLanes:          o.Lanes,
+				gpuMemoryBandwith: o.MemoryBandwith,
+				architecture:      o.Architecture,
+				numGPUs:           o.NumGPUs,
+
+				cpuCores:   o.CPUCores,
+				cpuName:    o.CPUName,
+				cpuGhz:     o.CPUGhz,
+				cpuArch:    o.CPUArch,
+				computeCap: o.ComputeCap,
+
+				ram: o.Ram,
+
+				diskSpace: o.DiskSpace,
+				diskBW:    o.DiskBandwith,
+				diskName:  o.DiskName,
+
+				uploadSpeed:   o.Upload,
+				downloadSpeed: o.Download,
+
+				totalCostPH:      o.DPHTotal,
+				gpuCostPH:        o.Search.GpuCostPerHour,
+				diskCostPH:       o.Search.DiskHour,
+				uploadCostPH:     o.UploadCost,
+				downloadCostPH:   o.DownloadCost,
+				flopsPerDollarPH: o.FlopsPerDollarPH,
+			})
+		}
 	}
 	fmt.Printf("Found %d vast gpus\n", len(out))
 	for _, o := range out {
