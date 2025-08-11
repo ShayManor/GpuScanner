@@ -17,7 +17,7 @@ type Search struct {
 }
 
 type offer struct {
-	ID               int64   `json:"id"`
+	ID               string  `json:"id"`
 	GPUName          string  `json:"gpu_name"`
 	CPUCores         float64 `json:"cpu_cores"`
 	NumGPUs          int     `json:"num_gpus"`
@@ -30,9 +30,7 @@ type offer struct {
 	Reliability      float64 `json:"reliability"`
 	Duration         float64 `json:"duration"`
 	Flops            float64 `json:"total_flops"`
-	Lanes            int     `json:"gpu_lanes"`
 	MemoryBandwith   float64 `json:"gpu_mem_bw"`
-	Architecture     string  `json:"gpu_arch"`
 	CPUName          string  `json:"cpu_name"`
 	CPUGhz           float64 `json:"cpu_ghz"`
 	CPUArch          string  `json:"cpu_arch"`
@@ -73,20 +71,18 @@ func vastGetter() ([]GPU, error) {
 				location:    o.Location,
 				reliability: o.Reliability,
 				duration:    o.Duration,
+				source:      "vast",
 
 				name:              o.GPUName,
 				vram:              o.Vram,
 				totalFlops:        o.Flops,
-				gpuLanes:          o.Lanes,
 				gpuMemoryBandwith: o.MemoryBandwith,
-				architecture:      o.Architecture,
 				numGPUs:           o.NumGPUs,
 
-				cpuCores:   o.CPUCores,
-				cpuName:    o.CPUName,
-				cpuGhz:     o.CPUGhz,
-				cpuArch:    o.CPUArch,
-				computeCap: o.ComputeCap,
+				cpuCores: o.CPUCores,
+				cpuName:  o.CPUName,
+				cpuGhz:   o.CPUGhz,
+				cpuArch:  o.CPUArch,
 
 				ram: o.Ram,
 

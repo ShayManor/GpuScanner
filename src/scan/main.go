@@ -4,6 +4,6 @@ import "fmt"
 
 func main() {
 	fmt.Println("Hello GPUs")
-	getter := Getter(vastGetter)
+	getter := Getter(tensordockGetter)
 	fmt.Println(scan(getter))
 }
