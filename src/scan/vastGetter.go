@@ -67,38 +67,38 @@ func vastGetter() ([]GPU, error) {
 	for _, o := range sr.Offers {
 		if o.Rentable {
 			out = append(out, GPU{
-				id:          o.ID,
-				location:    o.Location,
-				reliability: o.Reliability,
-				duration:    o.Duration,
-				source:      "vast",
+				Id:          o.ID,
+				Location:    o.Location,
+				Reliability: o.Reliability,
+				Duration:    o.Duration,
+				Source:      "vast",
 
-				name:              o.GPUName,
-				vram:              o.Vram,
-				totalFlops:        o.Flops,
-				gpuMemoryBandwith: o.MemoryBandwith,
-				numGPUs:           o.NumGPUs,
+				Name:              o.GPUName,
+				Vram:              o.Vram,
+				TotalFlops:        o.Flops,
+				GpuMemoryBandwith: o.MemoryBandwith,
+				NumGPUs:           o.NumGPUs,
 
-				cpuCores: o.CPUCores,
-				cpuName:  o.CPUName,
-				cpuGhz:   o.CPUGhz,
-				cpuArch:  o.CPUArch,
+				CpuCores: o.CPUCores,
+				CpuName:  o.CPUName,
+				CpuGhz:   o.CPUGhz,
+				CpuArch:  o.CPUArch,
 
-				ram: o.Ram,
+				Ram: o.Ram,
 
-				diskSpace: o.DiskSpace,
-				diskBW:    o.DiskBandwith,
-				diskName:  o.DiskName,
+				DiskSpace: o.DiskSpace,
+				DiskBW:    o.DiskBandwith,
+				DiskName:  o.DiskName,
 
-				uploadSpeed:   o.Upload,
-				downloadSpeed: o.Download,
+				UploadSpeed:   o.Upload,
+				DownloadSpeed: o.Download,
 
-				totalCostPH:      o.DPHTotal,
-				gpuCostPH:        o.Search.GpuCostPerHour,
-				diskCostPH:       o.Search.DiskHour,
-				uploadCostPH:     o.UploadCost,
-				downloadCostPH:   o.DownloadCost,
-				flopsPerDollarPH: o.FlopsPerDollarPH,
+				TotalCostPH:      o.DPHTotal,
+				GpuCostPH:        o.Search.GpuCostPerHour,
+				DiskCostPH:       o.Search.DiskHour,
+				UploadCostPH:     o.UploadCost,
+				DownloadCostPH:   o.DownloadCost,
+				FlopsPerDollarPH: o.FlopsPerDollarPH,
 			})
 		}
 	}

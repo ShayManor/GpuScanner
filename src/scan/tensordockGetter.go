@@ -230,40 +230,40 @@ func tensordockGetter() ([]GPU, error) {
 			}
 			totalFlops, _, memBWGBs, _ := lookupGPUHardware(g.V0Name)
 			out = append(out, GPU{
-				id:          hn.ID,
-				location:    loc,
-				reliability: hn.UptimePercentage / 100.0, // docs give percent
-				duration:    0,                           // not exposed
+				Id:          hn.ID,
+				Location:    loc,
+				Reliability: hn.UptimePercentage / 100.0, // docs give percent
+				Duration:    0,                           // not exposed
 
-				name:              g.V0Name,
-				vram:              parseVRAMMB(g.V0Name),
-				totalFlops:        totalFlops, // not exposed
-				gpuMemoryBandwith: memBWGBs,   // not exposed
-				numGPUs:           g.AvailableCount,
+				Name:              g.V0Name,
+				Vram:              parseVRAMMB(g.V0Name),
+				TotalFlops:        totalFlops, // not exposed
+				GpuMemoryBandwith: memBWGBs,   // not exposed
+				NumGPUs:           g.AvailableCount,
 
-				cpuCores: float64(hn.AvailableResources.VCPUCount),
-				cpuName:  "",
-				cpuGhz:   0,
-				cpuArch:  "",
+				CpuCores: float64(hn.AvailableResources.VCPUCount),
+				CpuName:  "",
+				CpuGhz:   0,
+				CpuArch:  "",
 
-				ram: hn.AvailableResources.RAMGB, // GB
+				Ram: hn.AvailableResources.RAMGB, // GB
 
-				diskSpace: hn.AvailableResources.StorageGB, // GB
-				diskBW:    0,
-				diskName:  "",
+				DiskSpace: hn.AvailableResources.StorageGB, // GB
+				DiskBW:    0,
+				DiskName:  "",
 
-				uploadSpeed:   upMbps,
-				downloadSpeed: downMbps,
+				UploadSpeed:   upMbps,
+				DownloadSpeed: downMbps,
 
 				// Prices: TensorDock exposes GPU price/hr, plus unit prices for CPU/RAM/Storage.
 				// To keep semantics consistent with Vast, we set totalCostPH to GPU price here.
-				totalCostPH:      g.PricePerHr,
-				gpuCostPH:        g.PricePerHr,
-				diskCostPH:       g.PricePerHr, // per-GB rate exists, but we avoid mixing units here
-				uploadCostPH:     0,
-				downloadCostPH:   0,
-				flopsPerDollarPH: totalFlops / g.PricePerHr,
-				source:           "tensordock",
+				TotalCostPH:      g.PricePerHr,
+				GpuCostPH:        g.PricePerHr,
+				DiskCostPH:       g.PricePerHr, // per-GB rate exists, but we avoid mixing units here
+				UploadCostPH:     0,
+				DownloadCostPH:   0,
+				FlopsPerDollarPH: totalFlops / g.PricePerHr,
+				Source:           "tensordock",
 			})
 		}
 	}

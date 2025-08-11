@@ -341,38 +341,38 @@ query {
 			}
 
 			out = append(out, GPU{
-				id:          fmt.Sprintf("%s-%dx", strings.ReplaceAll(t.ID, " ", "-"), gpuCount),
-				location:    cloudType,
-				reliability: reliability,
-				duration:    0, // not exposed
+				Id:          fmt.Sprintf("%s-%dx", strings.ReplaceAll(t.ID, " ", "-"), gpuCount),
+				Location:    cloudType,
+				Reliability: reliability,
+				Duration:    0, // not exposed
 
-				source:            "runpod",
-				name:              t.DisplayName,
-				vram:              vramMB,
-				totalFlops:        totalSystemFlops,
-				gpuMemoryBandwith: memBW,
-				numGPUs:           gpuCount,
+				Source:            "runpod",
+				Name:              t.DisplayName,
+				Vram:              vramMB,
+				TotalFlops:        totalSystemFlops,
+				GpuMemoryBandwith: memBW,
+				NumGPUs:           gpuCount,
 
-				cpuCores: float64(vcpus),
-				cpuName:  "AMD EPYC",
-				cpuGhz:   2.5,
-				cpuArch:  "x86_64",
+				CpuCores: float64(vcpus),
+				CpuName:  "AMD EPYC",
+				CpuGhz:   2.5,
+				CpuArch:  "x86_64",
 
-				ram: memory,
+				Ram: memory,
 
-				diskSpace: float64(disk),
-				diskBW:    2000, // NVMe typical bandwidth
-				diskName:  "NVMe SSD",
+				DiskSpace: float64(disk),
+				DiskBW:    2000, // NVMe typical bandwidth
+				DiskName:  "NVMe SSD",
 
-				uploadSpeed:   10000, // 10 Gbps default
-				downloadSpeed: 10000, // 10 Gbps default
+				UploadSpeed:   10000, // 10 Gbps default
+				DownloadSpeed: 10000, // 10 Gbps default
 
-				totalCostPH:      totalPrice,
-				gpuCostPH:        totalPrice,
-				diskCostPH:       0, // Included in total
-				uploadCostPH:     0, // Included in total
-				downloadCostPH:   0, // Included in total
-				flopsPerDollarPH: flopsPerDollar,
+				TotalCostPH:      totalPrice,
+				GpuCostPH:        totalPrice,
+				DiskCostPH:       0, // Included in total
+				UploadCostPH:     0, // Included in total
+				DownloadCostPH:   0, // Included in total
+				FlopsPerDollarPH: flopsPerDollar,
 			})
 		}
 	}
