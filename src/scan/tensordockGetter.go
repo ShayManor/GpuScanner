@@ -263,7 +263,7 @@ func tensordockGetter() ([]GPU, error) {
 				uploadCostPH:     0,
 				downloadCostPH:   0,
 				flopsPerDollarPH: totalFlops / g.PricePerHr,
-				Source:           "tensordock",
+				source:           "tensordock",
 			})
 		}
 	}
