@@ -4,24 +4,22 @@ import "fmt"
 
 type GPU struct {
 	// Instance details
-	id          int64
+	id          string
 	location    string
 	reliability float64
 	duration    float64
+	source      string // e.g., "tensordock", "vast", etc.
 	// GPU details
 	name              string
 	vram              int
 	totalFlops        float64
-	gpuLanes          int
 	gpuMemoryBandwith float64
-	architecture      string
 	numGPUs           int
 	// CPU specs
-	cpuCores   float64
-	cpuName    string
-	cpuGhz     float64
-	cpuArch    string
-	computeCap int
+	cpuCores float64
+	cpuName  string
+	cpuGhz   float64
+	cpuArch  string
 	// Ram
 	ram int
 	// SSD
@@ -47,19 +45,16 @@ func (g GPU) toString() string {
 		"ID: %d\n"+
 		"Name: %s\n"+
 		"Location: %s\n"+
-		"Architecture: %s\n"+
 		"Total GPUs: %d\n"+
 		"VRAM: %d MB\n"+
 		"Total FLOPS: %.2e\n"+
 		"FLOPS/Dollar/Hour: %.2f\n"+
 		"Reliability: %.2f%%\n"+
 		"Duration: %.2f hours\n"+
-		"GPU Lanes: %d\n"+
 		"GPU Memory Bandwidth: %.2f GB/s\n"+
 		"CPU: %s (%s)\n"+
 		"CPU Cores: %.1f\n"+
 		"CPU Clock: %.2f GHz\n"+
-		"Compute Capability: %d\n"+
 		"RAM: %d GB\n"+
 		"Storage: %.2f GB (%s)\n"+
 		"Disk Bandwidth: %.2f GB/s\n"+
@@ -73,20 +68,17 @@ func (g GPU) toString() string {
 		g.id,
 		g.name,
 		g.location,
-		g.architecture,
 		g.numGPUs,
 		g.vram,
 		g.totalFlops,
 		g.flopsPerDollarPH,
 		g.reliability*100,
 		g.duration,
-		g.gpuLanes,
 		g.gpuMemoryBandwith,
 		g.cpuName,
 		g.cpuArch,
 		g.cpuCores,
 		g.cpuGhz,
-		g.computeCap,
 		g.ram,
 		g.diskSpace,
 		g.diskName,
