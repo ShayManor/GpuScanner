@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	_ "github.com/shaymanor/GpuScanner/docs"
@@ -19,6 +20,15 @@ import (
 // @schemes         https http
 func main() {
 	r := chi.NewRouter()
+
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		ExposedHeaders:   []string{"Content-Length"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
 
 	// API
 	r.Get("/gpus", getHandler)

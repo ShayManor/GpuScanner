@@ -52,7 +52,7 @@ type GPU struct {
 }
 
 var (
-	supabaseURL = "https://eteavfeiumodbjywzqfa.supabase.co/"
+	supabaseURL = "https://eteavfeiumodbjywzqfa.supabase.co"
 	anonKey     = mustEnv("SUPABASE_ANON_KEY")
 	httpc       = &http.Client{Timeout: 10 * time.Second}
 )
@@ -70,7 +70,7 @@ func mustEnv(k string) string {
 // @Description Returns a JSON array of GPU offers (read-only).
 // @Tags        gpus
 // @Produce     json
-// @Param       source      query  string  false  "Provider (e.g., vast, tensordock, runpod)"
+// @Param       source      query  string  false  "Provider (e.g., vastai, tensordock, runpod)"
 // @Param       location    query  string  false  "Case-insensitive substring match"
 // @Param       max_price   query  number  false  "Max total_cost_ph"
 // @Param       min_flopsd  query  number  false  "Min flops_per_dollar_ph"

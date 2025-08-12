@@ -1,0 +1,46 @@
+steps:
+  # 1) Install swag CLI into a known path (module mode ON)
+  - name: golang:1.24-alpine
+    entrypoint: sh
+    env:
+      - GO111MODULE=on
+      - GOBIN=/workspace/bin
+    args:
+      - -c
+      - |
+        apk add --no-cache git
+        go install github.com/swaggo/swag/cmd/swag@latest
+
+  # 2) Generate Swagger from annotations (runs the binary directly)
+  - name: gcr.io/cloud-builders/go
+    env:
+      - GO111MODULE=on
+    entrypoint: /workspace/bin/swag
+    args: ["init", "-g", "cmd/api/main.go", "-o", "./docs"]
+
+  # 3) Build container via buildpacks, target the cmd/api package
+  - name: gcr.io/k8s-skaffold/pack
+    args:
+      [
+        "build", "${_IMG}",
+        "--builder", "gcr.io/buildpacks/builder",
+        "--publish",
+        "--env", "GOOGLE_BUILDABLE=./cmd/api",
+        "--path", "."
+      ]
+
+  # 4) (Optional) Deploy to Cloud Run as part of the build
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      [
+        "run","deploy","gpu-api",
+        "--image","${_IMG}",
+        "--region","us-central1",
+        "--allow-unauthenticated",
+        "--update-secrets","SUPABASE_URL=SUPABASE_URL:latest,SUPABASE_ANON_KEY=SUPABASE_ANON_KEY:latest",
+        "--memory","256Mi","--cpu","0.5","--min-instances","0","--max-instances","3"
+      ]
+
+
+substitutions:
+  _IMG: us-central1-docker.pkg.dev/gpuscanner/containers/gpu-api:latest
