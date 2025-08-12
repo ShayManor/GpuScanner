@@ -2,6 +2,10 @@ name: Ingest GPUs
 on:
   schedule:
     - cron: "0 * * * * *"    # hourly
+  push:
+    branches:
+      - db-connect
+      - main
   workflow_dispatch: {}
 jobs:
   ingest:
