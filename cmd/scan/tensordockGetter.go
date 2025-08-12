@@ -269,8 +269,5 @@ func tensordockGetter() ([]GPU, error) {
 	}
 
 	fmt.Printf("Found %d TensorDock GPUs\n", len(out))
-	for _, o := range out {
-		fmt.Println(o.toString())
-	}
 	return out, nil
 }

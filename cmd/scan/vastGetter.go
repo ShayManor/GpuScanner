@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 type Response struct {
@@ -17,7 +18,7 @@ type Search struct {
 }
 
 type offer struct {
-	ID               string  `json:"id"`
+	ID               int     `json:"id"`
 	GPUName          string  `json:"gpu_name"`
 	CPUCores         float64 `json:"cpu_cores"`
 	NumGPUs          int     `json:"num_gpus"`
@@ -62,12 +63,11 @@ func vastGetter() ([]GPU, error) {
 		return nil, fmt.Errorf("decode: %w", err)
 	}
 
-	// Project to your lean slice.
 	out := make([]GPU, 0, len(sr.Offers))
 	for _, o := range sr.Offers {
 		if o.Rentable {
 			out = append(out, GPU{
-				Id:          o.ID,
+				Id:          strconv.Itoa(o.ID),
 				Location:    o.Location,
 				Reliability: o.Reliability,
 				Duration:    o.Duration,
@@ -103,8 +103,5 @@ func vastGetter() ([]GPU, error) {
 		}
 	}
 	fmt.Printf("Found %d vast gpus\n", len(out))
-	for _, o := range out {
-		fmt.Println(o.toString())
-	}
 	return out, nil
 }

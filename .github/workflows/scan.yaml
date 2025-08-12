@@ -1,0 +1,22 @@
+name: Ingest GPUs
+on:
+  schedule:
+    - cron: "0 * * * *"    # hourly
+  push:
+    branches:
+      - db-connect
+      - main
+  workflow_dispatch: {}
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.24" }
+      - run: go run ./cmd/scan
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          TENSORDOCK_TOKEN: ${{ secrets.TENSORDOCK_TOKEN}}
+          RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY}}
