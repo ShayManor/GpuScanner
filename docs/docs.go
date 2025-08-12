@@ -18,6 +18,9 @@ const docTemplate = `{
         "/gpus": {
             "get": {
                 "description": "Returns a JSON array of GPU offers (read-only).",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "gpus"
                 ],
@@ -25,7 +28,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Provider (e.g., vast, tensordock)",
+                        "description": "Provider (e.g., vast, tensordock, runpod)",
                         "name": "source",
                         "in": "query"
                     },
@@ -50,11 +53,13 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "default": "updated_at.desc",
-                        "description": "Sort (e.g., updated_at.desc)",
+                        "description": "Column.direction (e.g., updated_at.desc)",
                         "name": "sort",
                         "in": "query"
                     },
                     {
+                        "maximum": 1000,
+                        "minimum": 1,
                         "type": "integer",
                         "default": 200,
                         "description": "Limit (1-1000)",
@@ -62,6 +67,7 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "minimum": 0,
                         "type": "integer",
                         "description": "Offset for pagination",
                         "name": "offset",
@@ -202,6 +208,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Read-only list of GPU offers. Updated hourly.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
+	LeftDelim:        "{{",
+	RightDelim:       "}}",
 }
 
 func init() {

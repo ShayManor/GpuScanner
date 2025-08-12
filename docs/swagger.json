@@ -15,6 +15,9 @@
         "/gpus": {
             "get": {
                 "description": "Returns a JSON array of GPU offers (read-only).",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "gpus"
                 ],
@@ -22,7 +25,7 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Provider (e.g., vast, tensordock)",
+                        "description": "Provider (e.g., vast, tensordock, runpod)",
                         "name": "source",
                         "in": "query"
                     },
@@ -47,11 +50,13 @@
                     {
                         "type": "string",
                         "default": "updated_at.desc",
-                        "description": "Sort (e.g., updated_at.desc)",
+                        "description": "Column.direction (e.g., updated_at.desc)",
                         "name": "sort",
                         "in": "query"
                     },
                     {
+                        "maximum": 1000,
+                        "minimum": 1,
                         "type": "integer",
                         "default": 200,
                         "description": "Limit (1-1000)",
@@ -59,6 +64,7 @@
                         "in": "query"
                     },
                     {
+                        "minimum": 0,
                         "type": "integer",
                         "description": "Offset for pagination",
                         "name": "offset",

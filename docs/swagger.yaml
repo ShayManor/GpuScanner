@@ -75,7 +75,7 @@ paths:
     get:
       description: Returns a JSON array of GPU offers (read-only).
       parameters:
-      - description: Provider (e.g., vast, tensordock)
+      - description: Provider (e.g., vast, tensordock, runpod)
         in: query
         name: source
         type: string
@@ -92,19 +92,24 @@ paths:
         name: min_flopsd
         type: number
       - default: updated_at.desc
-        description: Sort (e.g., updated_at.desc)
+        description: Column.direction (e.g., updated_at.desc)
         in: query
         name: sort
         type: string
       - default: 200
         description: Limit (1-1000)
         in: query
+        maximum: 1000
+        minimum: 1
         name: limit
         type: integer
       - description: Offset for pagination
         in: query
+        minimum: 0
         name: offset
         type: integer
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
