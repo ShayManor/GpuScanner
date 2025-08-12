@@ -53,7 +53,7 @@ type GPU struct {
 
 var (
 	supabaseURL = "https://eteavfeiumodbjywzqfa.supabase.co/"
-	anonKey     = mustEnv("ANON_KEY")
+	anonKey     = mustEnv("SUPABASE_ANON_KEY")
 	httpc       = &http.Client{Timeout: 10 * time.Second}
 )
 
