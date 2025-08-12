@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -37,6 +38,7 @@ func main() {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode >= 300 {
-		log.Fatalf("upsert failed: %s", resp.Status)
+		b, _ := io.ReadAll(resp.Body)
+		log.Fatalf("upsert failed: %s %s", resp.Status, string(b))
 	}
 }

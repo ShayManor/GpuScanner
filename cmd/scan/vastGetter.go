@@ -103,8 +103,5 @@ func vastGetter() ([]GPU, error) {
 		}
 	}
 	fmt.Printf("Found %d vast gpus\n", len(out))
-	for _, o := range out {
-		fmt.Println(o.toString())
-	}
 	return out, nil
 }

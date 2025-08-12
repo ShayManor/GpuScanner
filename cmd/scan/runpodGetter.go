@@ -378,8 +378,5 @@ query {
 	}
 
 	fmt.Printf("Found %d RunPod GPU configurations\n", len(out))
-	for _, o := range out {
-		fmt.Println(o.toString())
-	}
 	return out, nil
 }
