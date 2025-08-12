@@ -1,3 +1,4 @@
+// Scans different GPU sellers, standardizes the data, and aggregates onto supabase db
 package main
 
 import (

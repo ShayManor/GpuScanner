@@ -1,0 +1,84 @@
+openapi: 3.1.0
+info:
+  title: GPU Catalog API
+  version: 1.0.0
+servers:
+  - url: /
+paths:
+  /gpus:
+    get:
+      summary: List GPUs
+      description: Read-only list of GPU offers. Updated hourly.
+      parameters:
+        - in: query
+          name: source
+          schema: { type: string }
+          description: Filter by provider (e.g., vast, tensordock)
+        - in: query
+          name: location
+          schema: { type: string }
+          description: Case-insensitive substring match
+        - in: query
+          name: max_price
+          schema: { type: number, format: float }
+          description: Max total_cost_ph
+        - in: query
+          name: min_flopsd
+          schema: { type: number, format: float }
+          description: Min flops_per_dollar_ph
+        - in: query
+          name: sort
+          schema: { type: string, default: updated_at.desc }
+          description: Column sorting, e.g. flops_per_dollar_ph.desc
+        - in: query
+          name: limit
+          schema: { type: integer, default: 200, minimum: 1, maximum: 1000 }
+        - in: query
+          name: offset
+          schema: { type: integer, minimum: 0 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GPU"
+        "400":
+          description: Bad Request
+        "502":
+          description: Upstream error
+components:
+  schemas:
+    GPU:
+      type: object
+      required: [id, source, location, name, vram_mb, num_gpus]
+      properties:
+        id: { type: string }
+        source: { type: string }
+        location: { type: string }
+        reliability: { type: number, format: float }
+        duration_hours: { type: number, format: float }
+        name: { type: string }
+        vram_mb: { type: integer }
+        total_flops: { type: number, format: float }
+        gpu_mem_bw_gbps: { type: number, format: float }
+        num_gpus: { type: integer }
+        cpu_cores: { type: number, format: float }
+        cpu_name: { type: string }
+        cpu_ghz: { type: number, format: float }
+        cpu_arch: { type: string }
+        ram_mb: { type: integer }
+        disk_space_gb: { type: number, format: float }
+        disk_bw_gbps: { type: number, format: float }
+        disk_name: { type: string }
+        upload_mbps: { type: number, format: float }
+        download_mbps: { type: number, format: float }
+        total_cost_ph: { type: number, format: float }
+        gpu_cost_ph: { type: number, format: float }
+        disk_cost_ph: { type: number, format: float }
+        upload_cost_ph: { type: number, format: float }
+        download_cost_ph: { type: number, format: float }
+        flops_per_dollar_ph: { type: number, format: float }
+        updated_at: { type: string, format: date-time }
