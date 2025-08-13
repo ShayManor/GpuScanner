@@ -51,8 +51,6 @@ func fetchLambdaInstanceTypes() (map[string]LambdaInstanceType, error) {
 		return nil, fmt.Errorf("fetch lambda hostnodes: %w", err)
 	}
 	defer resp.Body.Close()
-	fmt.Println("response Status:", resp.Status)
-	fmt.Println("response Body:", resp.Body)
 
 	var response LambdaInstanceTypesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {

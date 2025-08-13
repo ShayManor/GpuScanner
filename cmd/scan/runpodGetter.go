@@ -388,7 +388,6 @@ query {
 				FlopsPerDollarPH: flopsPerDollar,
 			}
 			newGpu.Url = getRunPodURL(newGpu)
-			fmt.Println(newGpu.Url)
 			out = append(out, newGpu)
 		}
 	}
