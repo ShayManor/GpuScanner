@@ -36,6 +36,12 @@ func main() {
 	// Swagger UI at /docs
 	r.Get("/docs/*", httpSwagger.WrapHandler)
 
+	h, err := spaHandler()
+	if err != nil {
+		log.Fatal(err)
+	}
+	r.Mount("/", h)
+
 	addr := ":" + coalesce(os.Getenv("PORT"), "8080")
 	log.Println("listening on", addr)
 	log.Fatal(http.ListenAndServe(addr, r))

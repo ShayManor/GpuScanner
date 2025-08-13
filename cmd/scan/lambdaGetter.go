@@ -51,8 +51,6 @@ func fetchLambdaInstanceTypes() (map[string]LambdaInstanceType, error) {
 		return nil, fmt.Errorf("fetch lambda hostnodes: %w", err)
 	}
 	defer resp.Body.Close()
-	fmt.Println("response Status:", resp.Status)
-	fmt.Println("response Body:", resp.Body)
 
 	var response LambdaInstanceTypesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
@@ -83,7 +81,7 @@ func lambdaGetter() ([]GPU, error) {
 		// Extract VRAM from GPU description
 		vram := extractVRAM(instance.Instance.GPUDescription)
 		if len(instance.Region) > 0 {
-			flops, _ := runpodGPULookup(typeName)
+			flops, _ := gpuSpecs(typeName)
 			flops = float64(instance.Instance.Specs.GPUs) * flops / 10e11
 			region := instance.Region[0].Name
 			out = append(out, GPU{

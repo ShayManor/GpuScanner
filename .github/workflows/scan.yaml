@@ -19,3 +19,4 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           TENSORDOCK_TOKEN: ${{ secrets.TENSORDOCK_TOKEN}}
           RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY}}
+          LAMBDA_TOKEN: ${{ secrets.LAMBDA_TOKEN}}

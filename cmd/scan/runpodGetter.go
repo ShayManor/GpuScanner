@@ -84,131 +84,6 @@ var runpodPrices = map[string]float64{
 	"T4":             0.39,
 }
 
-// Enhanced GPU hardware lookup specifically for RunPod display names
-func runpodGPULookup(displayName string) (totalFlops float64, memBWGBs float64) {
-	// Clean up the display name for matching
-	name := strings.ToLower(displayName)
-
-	// RTX Consumer cards
-	if strings.Contains(name, "4090") || strings.Contains(name, "rtx 4090") {
-		return 82.6e12, 1008
-	}
-	if strings.Contains(name, "3090") || strings.Contains(name, "rtx 3090") {
-		return 35.6e12, 936
-	}
-	if strings.Contains(name, "3080") {
-		if strings.Contains(name, "ti") {
-			return 34.1e12, 912
-		}
-		return 29.8e12, 760
-	}
-	if strings.Contains(name, "3070") {
-		return 20.3e12, 448
-	}
-	if strings.Contains(name, "4070") {
-		return 29.1e12, 504
-	}
-	if strings.Contains(name, "4080") {
-		return 48.7e12, 716
-	}
-	if strings.Contains(name, "5090") {
-		return 150e12, 1792 // Estimated based on rumors
-	}
-	if strings.Contains(name, "5080") {
-		return 100e12, 960 // Estimated
-	}
-
-	// Data center cards
-	if strings.Contains(name, "a100") {
-		if strings.Contains(name, "sxm") {
-			return 19.5e12, 2039 // A100 SXM 80GB
-		}
-		return 19.5e12, 1935 // A100 PCIe 80GB
-	}
-	if strings.Contains(name, "h100") {
-		if strings.Contains(name, "nvl") {
-			return 67e12, 3350 // H100 NVL
-		}
-		if strings.Contains(name, "sxm") {
-			return 67e12, 3350 // H100 SXM
-		}
-		return 51e12, 2000 // H100 PCIe
-	}
-	if strings.Contains(name, "h200") {
-		return 67e12, 4800 // H200 SXM
-	}
-	if strings.Contains(name, "b200") {
-		return 144e12, 8000 // B200 estimated
-	}
-
-	// Professional/Workstation cards
-	if strings.Contains(name, "l40s") {
-		return 91.6e12, 864
-	}
-	if strings.Contains(name, "l40") && !strings.Contains(name, "l40s") {
-		return 90.5e12, 864
-	}
-	if strings.Contains(name, "l4") {
-		return 30.3e12, 300
-	}
-	if strings.Contains(name, "a30") {
-		return 10.3e12, 933
-	}
-	if strings.Contains(name, "a40") {
-		return 37.4e12, 696
-	}
-	if strings.Contains(name, "a6000") || strings.Contains(name, "rtx a6000") || strings.Contains(name, "rtxa6000") {
-		return 38.7e12, 768
-	}
-	if strings.Contains(name, "a5000") || strings.Contains(name, "rtx a5000") || strings.Contains(name, "rtxa5000") {
-		return 27.8e12, 768
-	}
-	if strings.Contains(name, "a4500") || strings.Contains(name, "rtx a4500") {
-		return 23.7e12, 640
-	}
-	if strings.Contains(name, "a4000") || strings.Contains(name, "rtx a4000") {
-		return 19.2e12, 448
-	}
-	if strings.Contains(name, "a2000") || strings.Contains(name, "rtx a2000") {
-		return 8e12, 288
-	}
-	if strings.Contains(name, "6000 ada") || strings.Contains(name, "rtx 6000") || strings.Contains(name, "rtx6000") {
-		return 91.1e12, 960
-	}
-	if strings.Contains(name, "5000 ada") {
-		return 65.3e12, 640
-	}
-	if strings.Contains(name, "4000 ada") {
-		return 26.7e12, 360
-	}
-	if strings.Contains(name, "2000 ada") {
-		return 12e12, 288
-	}
-
-	// Tesla cards
-	if strings.Contains(name, "v100") {
-		if strings.Contains(name, "32gb") {
-			return 15.7e12, 900
-		}
-		return 14e12, 900
-	}
-	if strings.Contains(name, "t4") {
-		return 8.1e12, 300
-	}
-
-	// AMD cards
-	if strings.Contains(name, "mi300x") {
-		return 163.4e12, 5300
-	}
-	if strings.Contains(name, "mi250") {
-		return 95.7e12, 3200
-	}
-
-	// Default fallback - try the original lookup
-	flops, _, bw, _ := lookupGPUHardware(displayName)
-	return flops, bw
-}
-
 func getRunPodURL(o GPU) string {
 	// Format: https://www.runpod.io/console/gpu-cloud/secure-cloud
 	gpuParam := strings.ReplaceAll(strings.ToUpper(o.Name), " ", "%20")
@@ -308,7 +183,7 @@ query {
 		}
 
 		// Get FLOPS and bandwidth using enhanced lookup
-		totalFlops, memBW := runpodGPULookup(t.DisplayName)
+		totalFlops, memBW := gpuSpecs(t.DisplayName)
 
 		// Create configurations for different GPU counts
 		gpuCounts := []int{1}
@@ -322,12 +197,13 @@ query {
 
 		for _, gpuCount := range gpuCounts {
 			// Scale resources
-			totalSystemFlops := totalFlops * float64(gpuCount)
+			totalSystemFlops := totalFlops * float64(gpuCount) / 1e12
+
 			totalPrice := price * float64(gpuCount)
 
 			// Estimate other resources based on GPU type and count
 			vcpus := gpuCount * 8
-			memory := gpuCount * 32
+			memory := gpuCount * 32 * 1024
 			disk := gpuCount * 100
 
 			// Premium GPUs get more resources
@@ -335,14 +211,14 @@ query {
 				strings.Contains(t.DisplayName, "H200") || strings.Contains(t.DisplayName, "MI300X") ||
 				strings.Contains(t.DisplayName, "B200") {
 				vcpus = gpuCount * 16
-				memory = gpuCount * 64
+				memory = gpuCount * 64 * 1024
 				disk = gpuCount * 200
 			}
 
 			// Calculate flops per dollar
 			flopsPerDollar := 0.0
 			if totalPrice > 0 && totalSystemFlops > 0 {
-				flopsPerDollar = totalSystemFlops / (totalPrice * 10e12)
+				flopsPerDollar = totalSystemFlops / totalPrice
 			}
 
 			// Determine reliability and cloud type based on price
@@ -388,7 +264,6 @@ query {
 				FlopsPerDollarPH: flopsPerDollar,
 			}
 			newGpu.Url = getRunPodURL(newGpu)
-			fmt.Println(newGpu.Url)
 			out = append(out, newGpu)
 		}
 	}
