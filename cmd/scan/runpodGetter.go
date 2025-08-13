@@ -157,10 +157,10 @@ func runpodGPULookup(displayName string) (totalFlops float64, memBWGBs float64) 
 	if strings.Contains(name, "a40") {
 		return 37.4e12, 696
 	}
-	if strings.Contains(name, "a6000") || strings.Contains(name, "rtx a6000") {
+	if strings.Contains(name, "a6000") || strings.Contains(name, "rtx a6000") || strings.Contains(name, "rtxa6000") {
 		return 38.7e12, 768
 	}
-	if strings.Contains(name, "a5000") || strings.Contains(name, "rtx a5000") {
+	if strings.Contains(name, "a5000") || strings.Contains(name, "rtx a5000") || strings.Contains(name, "rtxa5000") {
 		return 27.8e12, 768
 	}
 	if strings.Contains(name, "a4500") || strings.Contains(name, "rtx a4500") {
@@ -172,7 +172,7 @@ func runpodGPULookup(displayName string) (totalFlops float64, memBWGBs float64) 
 	if strings.Contains(name, "a2000") || strings.Contains(name, "rtx a2000") {
 		return 8e12, 288
 	}
-	if strings.Contains(name, "6000 ada") || strings.Contains(name, "rtx 6000") {
+	if strings.Contains(name, "6000 ada") || strings.Contains(name, "rtx 6000") || strings.Contains(name, "rtx6000") {
 		return 91.1e12, 960
 	}
 	if strings.Contains(name, "5000 ada") {
@@ -207,6 +207,19 @@ func runpodGPULookup(displayName string) (totalFlops float64, memBWGBs float64) 
 	// Default fallback - try the original lookup
 	flops, _, bw, _ := lookupGPUHardware(displayName)
 	return flops, bw
+}
+
+func getRunPodURL(o GPU) string {
+	// Format: https://www.runpod.io/console/gpu-cloud/secure-cloud
+	gpuParam := strings.ReplaceAll(strings.ToUpper(o.Name), " ", "%20")
+
+	// RunPod doesn't have direct filtering via URL params like Vast
+	// Best we can do is link to the marketplace with a GPU type hint
+	return fmt.Sprintf(
+		"https://www.console.runpod.io/deploy/?gpu=%s&count=%d&template=runpod-torch-v280",
+		gpuParam,
+		o.NumGPUs,
+	)
 }
 
 func runpodGetter() ([]GPU, error) {
@@ -340,7 +353,7 @@ query {
 				cloudType = "Secure Cloud"
 			}
 
-			out = append(out, GPU{
+			newGpu := GPU{
 				Id:          fmt.Sprintf("%s-%dx", strings.ReplaceAll(t.ID, " ", "-"), gpuCount),
 				Location:    cloudType,
 				Reliability: reliability,
@@ -373,7 +386,10 @@ query {
 				UploadCostPH:     0, // Included in total
 				DownloadCostPH:   0, // Included in total
 				FlopsPerDollarPH: flopsPerDollar,
-			})
+			}
+			newGpu.Url = getRunPodURL(newGpu)
+			fmt.Println(newGpu.Url)
+			out = append(out, newGpu)
 		}
 	}
 
