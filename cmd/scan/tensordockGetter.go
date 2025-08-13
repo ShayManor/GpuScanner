@@ -241,7 +241,8 @@ func tensordockGetter() ([]GPU, error) {
 			if g.AvailableCount <= 0 {
 				continue
 			}
-			totalFlops, _, memBWGBs, _ := lookupGPUHardware(g.V0Name)
+			totalFlops, memBWGBs := runpodGPULookup(g.V0Name)
+			totalFlops = totalFlops / 1e12
 			newGpu := GPU{
 				Id:          hn.ID,
 				Location:    loc,

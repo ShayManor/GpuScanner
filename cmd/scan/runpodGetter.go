@@ -160,7 +160,10 @@ func runpodGPULookup(displayName string) (totalFlops float64, memBWGBs float64) 
 	if strings.Contains(name, "a6000") || strings.Contains(name, "rtx a6000") || strings.Contains(name, "rtxa6000") {
 		return 38.7e12, 768
 	}
-	if strings.Contains(name, "a5000") || strings.Contains(name, "rtx a5000") || strings.Contains(name, "rtxa5000") {
+	if strings.Contains(name, "pro6000") {
+		return 117.3e12, 1800
+	}
+	if strings.Contains(name, "a5000") || strings.Contains(name, "rtx a5000") || strings.Contains(name, "rtxa5000") || strings.Contains(name, "5000ada") {
 		return 27.8e12, 768
 	}
 	if strings.Contains(name, "a4500") || strings.Contains(name, "rtx a4500") {
@@ -322,7 +325,8 @@ query {
 
 		for _, gpuCount := range gpuCounts {
 			// Scale resources
-			totalSystemFlops := totalFlops * float64(gpuCount)
+			totalSystemFlops := totalFlops * float64(gpuCount) / 1e12
+
 			totalPrice := price * float64(gpuCount)
 
 			// Estimate other resources based on GPU type and count
