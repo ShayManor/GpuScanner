@@ -1,45 +1,63 @@
-// Scans different GPU sellers, standardizes the data, and aggregates onto supabase db
 package main
 
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 )
 
 func main() {
-	getters := []Getter{
-		vastGetter,
-		runpodGetter,
-		tensordockGetter,
-	}
+	getters := []Getter{lambdaGetter, vastGetter, tensordockGetter, runpodGetter}
 
 	var rows []GPU
 	for _, getter := range getters {
 		rows = append(rows, scan(getter)...)
 	}
 
-	body, _ := json.Marshal(rows)
-	req, _ := http.NewRequest("POST",
-		os.Getenv("SUPABASE_URL")+"/rest/v1/gpus?on_conflict=id",
-		bytes.NewReader(body),
-	)
-	// Upsert:
-	req.Header.Set("Prefer", "resolution=merge-duplicates")
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("apikey", os.Getenv("SUPABASE_SERVICE_KEY"))
-	req.Header.Set("Authorization", "Bearer "+os.Getenv("SUPABASE_SERVICE_KEY"))
+	base := os.Getenv("SUPABASE_URL") + "/rest/v1/gpus"
+	key := os.Getenv("SUPABASE_SERVICE_KEY")
 
-	resp, err := http.DefaultClient.Do(req)
+	// 1) DELETE only rows we manage: source in (lambda, vast, tensordock, runpod)
+	sources := []string{"lambda", "vast", "tensordock", "runpod"}
+	q := url.Values{}
+	q.Set("source", "in.("+strings.Join(sources, ",")+")") // URL-encodes () as %28 %29
+	delURL := base + "?" + q.Encode()
+
+	delReq, _ := http.NewRequest("DELETE", delURL, nil)
+	delReq.Header.Set("apikey", key)
+	delReq.Header.Set("Authorization", "Bearer "+key)
+
+	delResp, err := http.DefaultClient.Do(delReq)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode >= 300 {
-		b, _ := io.ReadAll(resp.Body)
-		log.Fatalf("upsert failed: %s %s", resp.Status, string(b))
+	defer delResp.Body.Close()
+	if delResp.StatusCode >= 300 {
+		b, _ := io.ReadAll(delResp.Body)
+		log.Fatalf("delete failed: %s %s", delResp.Status, string(b))
 	}
+
+	// 2) INSERT fresh rows
+	body, _ := json.Marshal(rows)
+	insReq, _ := http.NewRequest("POST", base, bytes.NewReader(body))
+	insReq.Header.Set("Content-Type", "application/json")
+	insReq.Header.Set("apikey", key)
+	insReq.Header.Set("Authorization", "Bearer "+key)
+
+	insResp, err := http.DefaultClient.Do(insReq)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer insResp.Body.Close()
+	if insResp.StatusCode >= 300 {
+		b, _ := io.ReadAll(insResp.Body)
+		log.Fatalf("insert failed: %s %s", insResp.Status, string(b))
+	}
+	fmt.Println("replace OK")
 }

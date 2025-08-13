@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"hash/fnv"
 	"net/http"
 	"os"
 	"regexp"
@@ -11,6 +10,19 @@ import (
 	"strings"
 	"time"
 )
+
+func getTensorDockURL(o GPU) string {
+	// Format: https://marketplace.tensordock.com/deploy?gpu=GPU_NAME&location=LOCATION
+	gpuParam := strings.ReplaceAll(strings.ToLower(o.Name), " ", "_")
+
+	return fmt.Sprintf(
+		"https://marketplace.tensordock.com/deploy?gpu=%s&ram=%d&vcpus=%.0f&storage=%d",
+		gpuParam,
+		o.Ram/1000, // Convert MB to GB
+		o.CpuCores,
+		int(o.DiskSpace),
+	)
+}
 
 // ---- TensorDock API shapes (see docs) ----
 // GET https://dashboard.tensordock.com/api/v2/hostnodes (Bearer token)
@@ -69,124 +81,6 @@ func parseVRAMMB(name string) int {
 	return 0
 }
 
-func hashToInt64(s string) int64 {
-	h := fnv.New64a()
-	_, _ = h.Write([]byte(s))
-	u := h.Sum64()
-	return int64(u & 0x7fffffffffffffff) // keep it positive
-}
-
-func lookupGPUHardware(name string) (totalFlops float64, lanes int, memBWGBs float64, ok bool) {
-	type spec struct {
-		flops float64 // FP32 FLOP/s
-		lanes int
-		bwGBs float64
-	}
-	// Canonical table (sources: NVIDIA datasheets/architecture whitepapers).
-	table := map[string]spec{
-		// GeForce / Ada & Ampere
-		"rtx4090": {flops: 82.6e12, lanes: 16, bwGBs: 1008}, // Ada, 24GB GDDR6X
-		"rtx3090": {flops: 35.6e12, lanes: 16, bwGBs: 936},  // Ampere, 24GB GDDR6X
-
-		// Data center Ampere
-		"a100-40gb-pcie": {flops: 19.5e12, lanes: 16, bwGBs: 1555},
-		"a100-80gb-pcie": {flops: 19.5e12, lanes: 16, bwGBs: 1935},
-		"a100-40gb-sxm":  {flops: 19.5e12, lanes: 0, bwGBs: 1555},
-		"a100-80gb-sxm":  {flops: 19.5e12, lanes: 0, bwGBs: 2039},
-
-		// Hopper
-		"h100-80gb-sxm":  {flops: 67e12, lanes: 0, bwGBs: 3350},
-		"h100-80gb-pcie": {flops: 51e12, lanes: 16, bwGBs: 2000},
-
-		// Ada data center
-		"l40s": {flops: 91.6e12, lanes: 16, bwGBs: 864},
-		"l40":  {flops: 90.5e12, lanes: 16, bwGBs: 864},
-		"l4":   {flops: 30.3e12, lanes: 16, bwGBs: 300},
-
-		// Ampere data center midrange
-		"a10": {flops: 31.2e12, lanes: 16, bwGBs: 600},
-		"t4":  {flops: 8.1e12, lanes: 16, bwGBs: 300},
-	}
-
-	// Normalize input (lowercase, remove separators) and infer canonical key.
-	n := strings.ToLower(name)
-	n = strings.ReplaceAll(n, "_", "-")
-	n = strings.ReplaceAll(n, " ", "-")
-
-	// Helper: contains any of the substrings
-	contains := func(s string, subs ...string) bool {
-		for _, sub := range subs {
-			if strings.Contains(s, sub) {
-				return true
-			}
-		}
-		return false
-	}
-
-	// Try direct simple model keys first.
-	switch {
-	case contains(n, "4090"):
-		return table["rtx4090"].flops, table["rtx4090"].lanes, table["rtx4090"].bwGBs, true
-	case contains(n, "3090"):
-		return table["rtx3090"].flops, table["rtx3090"].lanes, table["rtx3090"].bwGBs, true
-	}
-
-	// A100 variants
-	if contains(n, "a100") {
-		isSXM := contains(n, "sxm")
-		gb80 := contains(n, "80gb", "80g", "-80")
-		gb40 := contains(n, "40gb", "40g", "-40")
-		if isSXM {
-			if gb80 {
-				return table["a100-80gb-sxm"].flops, table["a100-80gb-sxm"].lanes, table["a100-80gb-sxm"].bwGBs, true
-			}
-			if gb40 {
-				return table["a100-40gb-sxm"].flops, table["a100-40gb-sxm"].lanes, table["a100-40gb-sxm"].bwGBs, true
-			}
-			// default unknown-capacity SXM -> 80GB as a reasonable default
-			return table["a100-80gb-sxm"].flops, table["a100-80gb-sxm"].lanes, table["a100-80gb-sxm"].bwGBs, true
-		}
-		// Assume PCIe if not SXM
-		if gb80 {
-			return table["a100-80gb-pcie"].flops, table["a100-80gb-pcie"].lanes, table["a100-80gb-pcie"].bwGBs, true
-		}
-		if gb40 {
-			return table["a100-40gb-pcie"].flops, table["a100-40gb-pcie"].lanes, table["a100-40gb-pcie"].bwGBs, true
-		}
-		return table["a100-80gb-pcie"].flops, table["a100-80gb-pcie"].lanes, table["a100-80gb-pcie"].bwGBs, true
-	}
-
-	// H100 variants
-	if contains(n, "h100") {
-		isSXM := contains(n, "sxm")
-		if isSXM || contains(n, "nvl") {
-			return table["h100-80gb-sxm"].flops, table["h100-80gb-sxm"].lanes, table["h100-80gb-sxm"].bwGBs, true
-		}
-		return table["h100-80gb-pcie"].flops, table["h100-80gb-pcie"].lanes, table["h100-80gb-pcie"].bwGBs, true
-	}
-
-	// Ada DC: L40S/L40/L4
-	switch {
-	case contains(n, "l40s"):
-		return table["l40s"].flops, table["l40s"].lanes, table["l40s"].bwGBs, true
-	case contains(n, "l40"):
-		return table["l40"].flops, table["l40"].lanes, table["l40"].bwGBs, true
-	case contains(n, "l4"):
-		return table["l4"].flops, table["l4"].lanes, table["l4"].bwGBs, true
-	}
-
-	// Ampere DC midrange
-	switch {
-	case contains(n, "a10"):
-		return table["a10"].flops, table["a10"].lanes, table["a10"].bwGBs, true
-	case contains(n, "t4"):
-		return table["t4"].flops, table["t4"].lanes, table["t4"].bwGBs, true
-	}
-
-	// Not found
-	return 0, 0, 0, false
-}
-
 // Env var required: TENSORDOCK_TOKEN
 func tensordockGetter() ([]GPU, error) {
 	token := os.Getenv("TENSORDOCK_TOKEN")
@@ -228,8 +122,9 @@ func tensordockGetter() ([]GPU, error) {
 			if g.AvailableCount <= 0 {
 				continue
 			}
-			totalFlops, _, memBWGBs, _ := lookupGPUHardware(g.V0Name)
-			out = append(out, GPU{
+			totalFlops, memBWGBs := gpuSpecs(g.V0Name)
+			totalFlops = totalFlops / 1e12
+			newGpu := GPU{
 				Id:          hn.ID,
 				Location:    loc,
 				Reliability: hn.UptimePercentage / 100.0, // docs give percent
@@ -246,7 +141,7 @@ func tensordockGetter() ([]GPU, error) {
 				CpuGhz:   0,
 				CpuArch:  "",
 
-				Ram: hn.AvailableResources.RAMGB, // GB
+				Ram: hn.AvailableResources.RAMGB * 1024, // GB
 
 				DiskSpace: hn.AvailableResources.StorageGB, // GB
 				DiskBW:    0,
@@ -264,7 +159,10 @@ func tensordockGetter() ([]GPU, error) {
 				DownloadCostPH:   0,
 				FlopsPerDollarPH: totalFlops / g.PricePerHr,
 				Source:           "tensordock",
-			})
+			}
+			newGpu.Url = getTensorDockURL(newGpu)
+			out = append(out, newGpu)
+
 		}
 	}
 

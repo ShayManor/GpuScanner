@@ -75,7 +75,7 @@ paths:
     get:
       description: Returns a JSON array of GPU offers (read-only).
       parameters:
-      - description: Provider (e.g., vast, tensordock, runpod)
+      - description: Provider (e.g., vastai, tensordock, runpod)
         in: query
         name: source
         type: string

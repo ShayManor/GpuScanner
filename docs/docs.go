@@ -28,7 +28,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Provider (e.g., vast, tensordock, runpod)",
+                        "description": "Provider (e.g., vastai, tensordock, runpod)",
                         "name": "source",
                         "in": "query"
                     },

@@ -51,8 +51,8 @@ type offer struct {
 	Search           Search  `json:"search"`
 }
 
-func fetchVastOffers(limit, offset int) ([]offer, error) {
-	body := fmt.Sprintf(`{"limit":%d,"offset":%d}`, limit, offset)
+func fetchVastOffers(limit int) ([]offer, error) {
+	body := fmt.Sprintf(`{"q": {"order": ["dph_total"], "rentable": "true"}}, "limit":%d}`, limit)
 	req, _ := http.NewRequest("PUT", "https://console.vast.ai/api/v0/search/asks/", strings.NewReader(body))
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
@@ -66,22 +66,6 @@ func fetchVastOffers(limit, offset int) ([]offer, error) {
 		return nil, err
 	}
 	return sr.Offers, nil
-}
-
-func fetchAllVastOffers() ([]offer, error) {
-	const page = 64
-	var all []offer
-	for off := 0; ; off += page {
-		batch, err := fetchVastOffers(page, off)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, batch...)
-		if len(batch) < page {
-			break
-		} // last page
-	}
-	return all, nil
 }
 
 func isAllDigits(s string) bool {
@@ -166,7 +150,7 @@ func convertGPUNameToURLFormat(gpuName string) string {
 }
 
 func vastGetter() ([]GPU, error) {
-	sr, err := fetchAllVastOffers()
+	sr, err := fetchVastOffers(64)
 	if err != nil {
 		return nil, err
 	}
@@ -212,7 +196,7 @@ func vastGetter() ([]GPU, error) {
 			)
 
 			out = append(out, GPU{
-				Id:                strconv.Itoa(o.ID),
+				Id:                strconv.Itoa(o.ID) + "v",
 				Location:          o.Location,
 				Reliability:       o.Reliability,
 				Duration:          o.Duration,
@@ -247,6 +231,15 @@ func vastGetter() ([]GPU, error) {
 			})
 		}
 	}
-	fmt.Printf("Found %d vast gpus\n", len(out))
-	return out, nil
+	seen := make(map[string]struct{}, len(out))
+	in := out[:0]
+	for _, g := range out {
+		if _, ok := seen[g.Id]; ok {
+			continue
+		}
+		seen[g.Id] = struct{}{}
+		in = append(in, g)
+	}
+	fmt.Println("Found", len(in), "deduped vast GPUs")
+	return in, nil
 }
