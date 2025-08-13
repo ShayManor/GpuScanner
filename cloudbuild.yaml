@@ -28,7 +28,8 @@ steps:
         "--env", "GOOGLE_BUILDABLE=./cmd/api",
         "--path", "."
       ]
-    logging: CLOUD_LOGGING_ONLY
+    options:
+      logging: CLOUD_LOGGING_ONLY
 
   # 4) (Optional) Deploy to Cloud Run as part of the build
   - name: gcr.io/cloud-builders/gcloud
