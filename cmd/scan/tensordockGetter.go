@@ -12,6 +12,19 @@ import (
 	"time"
 )
 
+func getTensorDockURL(o GPU) string {
+	// Format: https://marketplace.tensordock.com/deploy?gpu=GPU_NAME&location=LOCATION
+	gpuParam := strings.ReplaceAll(strings.ToLower(o.Name), " ", "_")
+
+	return fmt.Sprintf(
+		"https://marketplace.tensordock.com/deploy?gpu=%s&ram=%d&vcpus=%.0f&storage=%d",
+		gpuParam,
+		o.Ram/1000, // Convert MB to GB
+		o.CpuCores,
+		int(o.DiskSpace),
+	)
+}
+
 // ---- TensorDock API shapes (see docs) ----
 // GET https://dashboard.tensordock.com/api/v2/hostnodes (Bearer token)
 // Ref: docs pages "Fetch Hostnodes and Locations" + "Getting Started".
@@ -229,7 +242,7 @@ func tensordockGetter() ([]GPU, error) {
 				continue
 			}
 			totalFlops, _, memBWGBs, _ := lookupGPUHardware(g.V0Name)
-			out = append(out, GPU{
+			newGpu := GPU{
 				Id:          hn.ID,
 				Location:    loc,
 				Reliability: hn.UptimePercentage / 100.0, // docs give percent
@@ -264,7 +277,10 @@ func tensordockGetter() ([]GPU, error) {
 				DownloadCostPH:   0,
 				FlopsPerDollarPH: totalFlops / g.PricePerHr,
 				Source:           "tensordock",
-			})
+			}
+			newGpu.Url = getTensorDockURL(newGpu)
+			out = append(out, newGpu)
+
 		}
 	}
 

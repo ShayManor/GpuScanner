@@ -4,6 +4,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -12,14 +13,18 @@ import (
 
 func main() {
 	getters := []Getter{
+		lambdaGetter,
 		vastGetter,
-		runpodGetter,
 		tensordockGetter,
+		runpodGetter,
 	}
 
 	var rows []GPU
 	for _, getter := range getters {
 		rows = append(rows, scan(getter)...)
+	}
+	for _, row := range rows {
+		fmt.Println(row.toString())
 	}
 
 	body, _ := json.Marshal(rows)
