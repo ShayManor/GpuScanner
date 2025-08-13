@@ -240,6 +240,6 @@ func vastGetter() ([]GPU, error) {
 		seen[g.Id] = struct{}{}
 		in = append(in, g)
 	}
-	fmt.Println("Found ", len(in), "deduped vast GPUs")
+	fmt.Println("Found", len(in), "deduped vast GPUs")
 	return in, nil
 }

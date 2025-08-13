@@ -260,7 +260,7 @@ func tensordockGetter() ([]GPU, error) {
 				CpuGhz:   0,
 				CpuArch:  "",
 
-				Ram: hn.AvailableResources.RAMGB, // GB
+				Ram: hn.AvailableResources.RAMGB * 1024, // GB
 
 				DiskSpace: hn.AvailableResources.StorageGB, // GB
 				DiskBW:    0,

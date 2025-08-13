@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GPU Finder — About</title>
+    <style>
+        :root { --bg:#0b0c0f; --elev:#12141a; --text:#e7ecf3; --muted:#9aa3b2; --border:#1f2430; --accent:#3b82f6; --radius:12px; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans"; color: var(--text); background: var(--bg); }
+        a { color: #9ec3ff; }
+        .wrap { max-width: 900px; margin: 0 auto; padding: 30px 16px 60px; }
+        header { display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; }
+        .brand { display:flex; align-items:center; gap: 10px; }
+        .logo { width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg, var(--accent), #60a5fa); box-shadow: 0 10px 24px rgba(59,130,246,.3); }
+        h1 { font-size: 20px; margin: 0; }
+        nav a { padding: 8px 12px; border-radius: 10px; text-decoration: none; color: var(--text); }
+        nav a:hover { background: #171b25; }
+        .card { background: var(--elev); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: 0 10px 22px rgba(0,0,0,.35); }
+        h2 { margin-top: 0; }
+        .muted { color: var(--muted); }
+        code { background: #0f1218; border: 1px solid var(--border); padding: 2px 6px; border-radius: 8px; }
+        table { width:100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 8px 8px; border-bottom: 1px solid #1a2130; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <div class="brand">
+            <div class="logo" aria-hidden="true"></div>
+            <h1>About</h1>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="search.html">Search</a>
+        </nav>
+    </header>
+
+    <article class="card">
+        <h2>What is this?</h2>
+        <p>GPU Finder is a minimal, client‑side UI for the read‑only endpoint
+            <code>GET https://gpu-api-891435322100.us-central1.run.app/gpus</code>. It renders the results as returned—no hidden normalization.</p>
+
+        <h2>Filtering & Sorting</h2>
+        <p>All filters are passed via query parameters. Supported parameters:</p>
+        <table>
+            <thead><tr><th>Param</th><th>Type</th><th>Meaning</th><th>Example</th></tr></thead>
+            <tbody>
+            <tr><td><code>source</code></td><td>string</td><td>Provider (e.g., <em>vastai</em>, <em>tensordock</em>, <em>runpod</em>)</td><td><code>?source=runpod</code></td></tr>
+            <tr><td><code>location</code></td><td>string</td><td>Case‑insensitive substring match</td><td><code>?location=us-west</code></td></tr>
+            <tr><td><code>max_price</code></td><td>number</td><td>Max <code>total_cost_ph</code> ($ per hour)</td><td><code>?max_price=2.5</code></td></tr>
+            <tr><td><code>min_flopsd</code></td><td>number</td><td>Min <code>flops_per_dollar_ph</code></td><td><code>?min_flopsd=10</code></td></tr>
+            <tr><td><code>sort</code></td><td>string</td><td><code>column.direction</code> (default <code>updated_at.desc</code>)</td><td><code>?sort=total_cost_ph.asc</code></td></tr>
+            <tr><td><code>limit</code></td><td>integer</td><td>1–1000 (default 200)</td><td><code>?limit=200</code></td></tr>
+            <tr><td><code>offset</code></td><td>integer</td><td>Pagination offset</td><td><code>?offset=200</code></td></tr>
+            </tbody>
+        </table>
+
+        <h2>Fields</h2>
+        <p>Each item is a <code>GPU</code> object with the fields below (subset shown):</p>
+        <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+            <tbody>
+            <tr><td><code>id</code></td><td>string</td><td>Instance identifier</td></tr>
+            <tr><td><code>source</code></td><td>string</td><td>Provider name</td></tr>
+            <tr><td><code>location</code></td><td>string</td><td>Region/zone (free‑text)</td></tr>
+            <tr><td><code>name</code></td><td>string</td><td>GPU model label as provided</td></tr>
+            <tr><td><code>num_gpus</code></td><td>integer</td><td>Count of GPUs</td></tr>
+            <tr><td><code>vram_mb</code></td><td>integer</td><td>VRAM in MB (UI shows MB plus an approximate GB conversion MB/1024)</td></tr>
+            <tr><td><code>ram_mb</code></td><td>integer</td><td>System RAM in MB (UI shows MB and ~GB)</td></tr>
+            <tr><td><code>total_flops</code></td><td>number</td><td>Numeric FLOPs value as supplied; unit/precision may vary by provider</td></tr>
+            <tr><td><code>flops_per_dollar_ph</code></td><td>number</td><td>FLOPs per $ per hour</td></tr>
+            <tr><td><code>total_cost_ph</code></td><td>number</td><td>Total $ per hour</td></tr>
+            <tr><td><code>reliability</code></td><td>number</td><td>0–1, displayed as %</td></tr>
+            <tr><td><code>upload_mbps</code>, <code>download_mbps</code></td><td>number</td><td>Network throughput</td></tr>
+            <tr><td><code>url</code></td><td>string</td><td>Link to provider page for the offer</td></tr>
+            <tr><td><code>updated_at</code></td><td>string</td><td>ISO timestamp</td></tr>
+            </tbody>
+        </table>
+
+        <h2>Notes on correctness</h2>
+        <ul>
+            <li>The UI does not reinterpret metrics; it displays fields as returned. Any provider‑specific meaning (e.g., FLOPs precision) is preserved.</li>
+            <li>VRAM/RAM are shown in MB with a convenience (~GB) conversion using MB/1024.</li>
+            <li>Sorting is delegated to the API via <code>sort</code> whenever possible.</li>
+        </ul>
+
+        <p class="muted">This site is static—just open <code>index.html</code> locally or host on any static server (GitHub Pages, Netlify, etc.).</p>
+    </article>
+</div>
+</body>
+</html>

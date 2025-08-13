@@ -346,7 +346,7 @@ query {
 			// Calculate flops per dollar
 			flopsPerDollar := 0.0
 			if totalPrice > 0 && totalSystemFlops > 0 {
-				flopsPerDollar = totalSystemFlops / (totalPrice * 10e12)
+				flopsPerDollar = totalSystemFlops / totalPrice
 			}
 
 			// Determine reliability and cloud type based on price
