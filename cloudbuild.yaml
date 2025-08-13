@@ -11,6 +11,15 @@ steps:
         apk add --no-cache git
         go install github.com/swaggo/swag/cmd/swag@latest
 
+  - name: alpine
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        rm -rf cmd/api/frontend
+        mkdir -p cmd/api/frontend
+        cp -r frontend/* cmd/api/frontend/
+
   # 2) Generate Swagger from annotations (runs the binary directly)
   - name: gcr.io/cloud-builders/go
     env:
