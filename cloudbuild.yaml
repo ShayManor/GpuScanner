@@ -28,8 +28,7 @@ steps:
         "--env", "GOOGLE_BUILDABLE=./cmd/api",
         "--path", "."
       ]
-    options:
-      logging: CLOUD_LOGGING_ONLY
+
 
   # 4) (Optional) Deploy to Cloud Run as part of the build
   - name: gcr.io/cloud-builders/gcloud
@@ -46,3 +45,6 @@ steps:
 
 substitutions:
   _IMG: us-central1-docker.pkg.dev/gpuscanner/containers/gpu-api:latest
+
+options:
+  logging: CLOUD_LOGGING_ONLY
