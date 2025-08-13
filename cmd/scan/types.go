@@ -12,6 +12,7 @@ type GPU struct {
 	Reliability float64 `json:"reliability" bson:"reliability"`
 	Duration    float64 `json:"duration_hours" bson:"duration_hours"`
 	Source      string  `json:"source" bson:"source"` // e.g., "tensordock", "vast", etc.
+	Url         string  `json:"url" bson:"url"`
 	// GPU details
 	Name              string  `json:"name" bson:"name"`
 	Vram              int     `json:"vram_mb" bson:"vram_mb"`
@@ -50,6 +51,7 @@ func (g GPU) toString() string {
 		"ID: %s\n"+
 		"Name: %s\n"+
 		"Location: %s\n"+
+		"Url: %s\n"+
 		"Total GPUs: %d\n"+
 		"VRAM: %d MB\n"+
 		"Total FLOPS: %.2e\n"+
@@ -74,6 +76,7 @@ func (g GPU) toString() string {
 		g.Id,
 		g.Name,
 		g.Location,
+		g.Url,
 		g.NumGPUs,
 		g.Vram,
 		g.TotalFlops,

@@ -4,7 +4,6 @@ on:
     - cron: "0 * * * *"    # hourly
   push:
     branches:
-      - db-connect
       - main
   workflow_dispatch: {}
 jobs:

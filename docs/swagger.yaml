@@ -1,0 +1,134 @@
+basePath: /
+definitions:
+  cmd_api.GPU:
+    properties:
+      cpu_arch:
+        type: string
+      cpu_cores:
+        description: CPU specs
+        type: number
+      cpu_ghz:
+        type: number
+      cpu_name:
+        type: string
+      disk_bw_gbps:
+        type: number
+      disk_cost_ph:
+        type: number
+      disk_name:
+        type: string
+      disk_space_gb:
+        description: SSD
+        type: number
+      download_cost_ph:
+        type: number
+      download_mbps:
+        type: number
+      duration_hours:
+        type: number
+      flops_per_dollar_ph:
+        type: number
+      gpu_cost_ph:
+        type: number
+      gpu_mem_bw_gbps:
+        type: number
+      id:
+        description: Instance details
+        type: string
+      location:
+        type: string
+      name:
+        description: GPU details
+        type: string
+      num_gpus:
+        type: integer
+      ram_mb:
+        description: Ram
+        type: integer
+      reliability:
+        type: number
+      source:
+        description: e.g., "tensordock", "vast", etc.
+        type: string
+      total_cost_ph:
+        description: Cost
+        type: number
+      total_flops:
+        type: number
+      updated_at:
+        type: string
+      upload_cost_ph:
+        type: number
+      upload_mbps:
+        description: Internet
+        type: number
+      vram_mb:
+        type: integer
+    type: object
+info:
+  contact: {}
+  description: Read-only list of GPU offers. Updated hourly.
+  title: GPU Catalog API
+  version: "1.0"
+paths:
+  /gpus:
+    get:
+      description: Returns a JSON array of GPU offers (read-only).
+      parameters:
+      - description: Provider (e.g., vast, tensordock, runpod)
+        in: query
+        name: source
+        type: string
+      - description: Case-insensitive substring match
+        in: query
+        name: location
+        type: string
+      - description: Max total_cost_ph
+        in: query
+        name: max_price
+        type: number
+      - description: Min flops_per_dollar_ph
+        in: query
+        name: min_flopsd
+        type: number
+      - default: updated_at.desc
+        description: Column.direction (e.g., updated_at.desc)
+        in: query
+        name: sort
+        type: string
+      - default: 200
+        description: Limit (1-1000)
+        in: query
+        maximum: 1000
+        minimum: 1
+        name: limit
+        type: integer
+      - description: Offset for pagination
+        in: query
+        minimum: 0
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/cmd_api.GPU'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "502":
+          description: Upstream error
+          schema:
+            type: string
+      summary: List GPUs
+      tags:
+      - gpus
+schemes:
+- https
+- http
+swagger: "2.0"

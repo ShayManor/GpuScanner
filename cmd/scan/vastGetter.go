@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type Response struct {
@@ -18,9 +20,9 @@ type Search struct {
 }
 
 type offer struct {
-	ID               int     `json:"id"`
+	ID               int     `json:"machine_id"`
 	GPUName          string  `json:"gpu_name"`
-	CPUCores         float64 `json:"cpu_cores"`
+	CPUCores         float64 `json:"cpu_cores_effective"`
 	NumGPUs          int     `json:"num_gpus"`
 	Vram             int     `json:"gpu_ram"`
 	Ram              int     `json:"cpu_ram"`
@@ -49,30 +51,173 @@ type offer struct {
 	Search           Search  `json:"search"`
 }
 
-func vastGetter() ([]GPU, error) {
-	response, err := http.Get("https://console.vast.ai/api/v0/search/asks/")
+func fetchVastOffers(limit, offset int) ([]offer, error) {
+	body := fmt.Sprintf(`{"limit":%d,"offset":%d}`, limit, offset)
+	req, _ := http.NewRequest("PUT", "https://console.vast.ai/api/v0/search/asks/", strings.NewReader(body))
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-
-		return nil, fmt.Errorf("Error fetching vast: %s\n", err)
+		return nil, err
 	}
-	defer response.Body.Close()
-
+	defer resp.Body.Close()
 	var sr Response
-	if err := json.NewDecoder(response.Body).Decode(&sr); err != nil {
-		fmt.Printf("Error: %s\n", err)
-		return nil, fmt.Errorf("decode: %w", err)
+	if err := json.NewDecoder(resp.Body).Decode(&sr); err != nil {
+		return nil, err
+	}
+	return sr.Offers, nil
+}
+
+func fetchAllVastOffers() ([]offer, error) {
+	const page = 64
+	var all []offer
+	for off := 0; ; off += page {
+		batch, err := fetchVastOffers(page, off)
+		if err != nil {
+			return nil, err
+		}
+		all = append(all, batch...)
+		if len(batch) < page {
+			break
+		} // last page
+	}
+	return all, nil
+}
+
+func isAllDigits(s string) bool {
+	if s == "" {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		if s[i] < '0' || s[i] > '9' {
+			return false
+		}
+	}
+	return true
+}
+
+// convertGPUNameToURLFormat converts GPU names from API format to URL parameter format
+// Examples: "RTX 4090" -> "rtx4090", "RTX 4090 D" -> "rtx4090D", "H200 NVL" -> "h200Nvl"
+func convertGPUNameToURLFormat(gpuName string) string {
+	// Handle empty string
+	if gpuName == "" {
+		return ""
 	}
 
-	out := make([]GPU, 0, len(sr.Offers))
-	for _, o := range sr.Offers {
-		if o.Rentable {
-			out = append(out, GPU{
-				Id:          strconv.Itoa(o.ID),
-				Location:    o.Location,
-				Reliability: o.Reliability,
-				Duration:    o.Duration,
-				Source:      "vast",
+	// Convert to lowercase and split by spaces
+	parts := strings.Fields(strings.ToLower(gpuName))
+	if len(parts) == 0 {
+		return ""
+	}
 
+	// Start with the first part (e.g., "rtx", "h200", "b200")
+	result := parts[0]
+	if len(parts) > 1 && parts[0] == "rtx" {
+		name := parts[1]
+		switch {
+		case strings.HasSuffix(name, "ti") && isAllDigits(name[:len(name)-2]):
+			parts[1] = name[:len(name)-2]
+			parts = append(parts, "ti")
+		case strings.HasSuffix(name, "s") && isAllDigits(name[:len(name)-1]):
+			// Guard against L40S-style workstation naming: we only do this for RTX + digits
+			parts[1] = name[:len(name)-1]
+			parts = append(parts, "s") // will map to "Super" below
+		}
+	}
+
+	// Process remaining parts - capitalize first letter of each
+	for i := 1; i < len(parts); i++ {
+		part := parts[i]
+		if len(part) > 0 {
+			// Special cases for known suffixes
+			switch strings.ToLower(part) {
+			case "ti":
+				result += "Ti"
+			case "s", "super":
+				result += "Super"
+			case "nvl":
+				result += "Nvl"
+			case "sxm":
+				result += "Sxm"
+			case "ada":
+				result += "Ada"
+			case "generation":
+				result += "Generation"
+			case "blackwell":
+				result += "Blackwell"
+			case "workstation":
+				result += "Workstation"
+			case "laptop":
+				result += "Laptop"
+			case "d":
+				result += "D"
+			default:
+				// Capitalize first letter
+				result += strings.Title(part)
+			}
+		}
+	}
+
+	// Special handling for "RTX A" series (e.g., "RTX A6000" -> "rtxA6000")
+	result = strings.Replace(result, "rtxa", "rtxA", 1)
+	result = strings.Replace(result, "rtxpro", "rtxPro", 1)
+
+	return result
+}
+
+func vastGetter() ([]GPU, error) {
+	sr, err := fetchAllVastOffers()
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]GPU, 0, len(sr))
+	for _, o := range sr {
+		if o.Rentable {
+			urlParams := fmt.Sprintf(
+				"gpuModelNames=%s&"+
+					"instanceType=onDemand&"+
+					"isOfferAvailable=true&"+
+					"isOfferCompatible=true&"+
+					"isOfferVerified=%t&"+
+					"machineCpuCoresMin=%.1f&"+
+					"machineCpuRamMin=8000&"+
+					"instanceDiskSizeMin=%.1f&"+
+					"machineReliabilityMin=%.2f&"+
+					"machineReliabilityMax=%.2f&"+
+					// Explicitly reset all other filters to defaults
+					"isHostSecure=false&"+
+					"isMachineIpStatic=false&"+
+					"isAvxSupported=false&"+
+					"isQueryInverted=false&"+
+					"instanceDurationMin=0&"+
+					"machineMegabitDownloadMin=0&"+
+					"machineMegabitUploadMin=0&"+
+					"machineCpuCoresMax=512&"+
+					"machineCpuRamMax=8000000&"+ // Empty = no max
+					"isOfferCompatible=false&"+
+					"instanceDiskSizeMin=32&"+
+					"sorts=priceInstanceHourly-asc&"+
+					"priceInstanceHourlyMax=%.4f&"+
+					"priceInstanceHourlyMin=%.4f&"+
+					"pageSize=256",
+				convertGPUNameToURLFormat(o.GPUName),
+				o.Verified,
+				math.Max(0, o.CPUCores-0.1),
+				math.Max(0, o.DiskSpace-0.1),
+				math.Max(0, o.Reliability-0.01),
+				math.Max(0, o.Reliability+0.01),
+				o.DPHTotal+0.01,
+				o.DPHTotal-0.01,
+			)
+
+			out = append(out, GPU{
+				Id:                strconv.Itoa(o.ID),
+				Location:          o.Location,
+				Reliability:       o.Reliability,
+				Duration:          o.Duration,
+				Source:            "vast",
+				Url:               fmt.Sprintf("https://cloud.vast.ai/create/?%s", urlParams),
 				Name:              o.GPUName,
 				Vram:              o.Vram,
 				TotalFlops:        o.Flops,
