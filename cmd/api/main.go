@@ -9,8 +9,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
-
-	_ "github.com/shaymanor/gpuscanner/docs"
 )
 
 // @title           GPU Catalog API
