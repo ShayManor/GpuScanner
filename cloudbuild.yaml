@@ -1,4 +1,5 @@
 steps:
+  # 1) Install swag CLI into a known path (module mode ON)
   - name: golang:1.24-alpine
     entrypoint: sh
     env:
@@ -9,17 +10,6 @@ steps:
       - |
         apk add --no-cache git
         go install github.com/swaggo/swag/cmd/swag@latest
-        /workspace/bin/swag init -g cmd/api/main.go -o ./docs
-
-  # 2) Now tidy with docs present (so deps for docs.go are captured)
-  - name: golang:1.24-alpine
-    entrypoint: sh
-    env:
-      - GO111MODULE=on
-    args:
-      - -c
-      - |
-        go mod tidy
 
 
 
@@ -28,7 +18,7 @@ steps:
     env:
       - GO111MODULE=on
     entrypoint: /workspace/bin/swag
-    args: ["init", "-g", "cmd/api/main.go", "-o", "./docs"]
+    args: ["init", "-g", "cmd/api/main.go", "-o", "./docs", "--parseDependency", "--parseInternal"]
 
 
   # 3) Build container via buildpacks, target the cmd/api package
