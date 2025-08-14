@@ -66,7 +66,6 @@ func fetchVastOffers(limit int) ([]offer, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&sr); err != nil {
 		return nil, err
 	}
-	fmt.Println(sr.Offers)
 	return sr.Offers, nil
 }
 
