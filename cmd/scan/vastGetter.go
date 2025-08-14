@@ -196,7 +196,7 @@ func vastGetter() ([]GPU, error) {
 			)
 
 			out = append(out, GPU{
-				Id:                strconv.Itoa(o.ID) + "v",
+				_Id:               strconv.Itoa(o.ID) + "v",
 				Location:          o.Location,
 				Reliability:       o.Reliability,
 				Duration:          o.Duration,
@@ -234,10 +234,10 @@ func vastGetter() ([]GPU, error) {
 	seen := make(map[string]struct{}, len(out))
 	in := out[:0]
 	for _, g := range out {
-		if _, ok := seen[g.Id]; ok {
+		if _, ok := seen[g._Id]; ok {
 			continue
 		}
-		seen[g.Id] = struct{}{}
+		seen[g._Id] = struct{}{}
 		in = append(in, g)
 	}
 	fmt.Println("Found", len(in), "deduped vast GPUs")

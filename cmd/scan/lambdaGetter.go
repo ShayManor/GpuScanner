@@ -85,7 +85,7 @@ func lambdaGetter() ([]GPU, error) {
 			flops = float64(instance.Instance.Specs.GPUs) * flops / 10e11
 			region := instance.Region[0].Name
 			out = append(out, GPU{
-				Id:               typeName,
+				_Id:              typeName,
 				Location:         region,
 				Source:           "lambda",
 				Url:              getLambdaURL(),

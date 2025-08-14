@@ -230,7 +230,7 @@ query {
 			}
 
 			newGpu := GPU{
-				Id:          fmt.Sprintf("%s-%dx", strings.ReplaceAll(t.ID, " ", "-"), gpuCount),
+				_Id:         fmt.Sprintf("%s-%dx", strings.ReplaceAll(t.ID, " ", "-"), gpuCount),
 				Location:    cloudType,
 				Reliability: reliability,
 				Duration:    0, // not exposed
