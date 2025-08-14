@@ -14,13 +14,13 @@ steps:
 
   # 3) Build container via buildpacks, target the cmd/api package
   - name: gcr.io/k8s-skaffold/pack
-    args:
-      [
+    args: [
       "build", "${_IMG}",
-      "--builder", "gcr.io/buildpacks/builder",
+      "--builder", "paketobuildpacks/builder-jammy-base",
       "--publish",
-      "--path", "."
-      ]
+      "--path", ".",
+      "--env", "BP_GO_BUILD_FLAGS=-mod=readonly"
+    ]
 
 
   # 4) (Optional) Deploy to Cloud Run as part of the build
