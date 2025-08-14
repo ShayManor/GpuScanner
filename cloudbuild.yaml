@@ -40,6 +40,7 @@ steps:
         "--builder", "gcr.io/buildpacks/builder",
         "--publish",
         "--env", "GOOGLE_BUILDABLE=./cmd/api",
+        "--env", "GOOGLE_GO_BUILD_FLAGS=-tags=embed",
         "--path", "."
       ]
 
