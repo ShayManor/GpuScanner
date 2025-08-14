@@ -47,9 +47,9 @@ func main() {
 	h, err := spaHandler()
 	if err != nil {
 		log.Printf("Failed to create SPA handler: %v", err)
-		log.Fatal(err)
+	} else {
+		r.Mount("/", h)
 	}
-	r.Mount("/", h)
 	port := "8080"
 	if os.Getenv("PORT") != "" {
 		port = os.Getenv("PORT")

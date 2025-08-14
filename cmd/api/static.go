@@ -14,7 +14,7 @@ import (
 
 // IMPORTANT: path is relative to THIS file's dir (cmd/api → repo root → frontend)
 //
-//go:embed all:frontend
+//go:embed frontend
 var frontendFS embed.FS
 
 func spaHandler() (http.Handler, error) {
