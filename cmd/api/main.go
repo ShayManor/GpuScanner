@@ -44,6 +44,9 @@ func main() {
 	r.Get("/gpus/count", countHandler)
 
 	// Swagger UI at /docs
+	r.Get("/docs", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/docs/index.html", http.StatusMovedPermanently)
+	})
 	r.Get("/docs/*", httpSwagger.WrapHandler)
 
 	log.Println("Setting up SPA handler...")

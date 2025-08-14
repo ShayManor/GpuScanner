@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-// GPU is the response schema (subset shown; keep your full struct if you want).
+// GPU is the response schema
 // swagger:model GPU
 type GPU struct {
 	// Instance details
@@ -49,6 +49,12 @@ type GPU struct {
 	FlopsPerDollarPH float64 `json:"flops_per_dollar_ph" bson:"flops_per_dollar_ph"`
 
 	UpdatedAt time.Time `json:"updated_at" bson:"updated_at"`
+}
+
+// Count is the response schema for /gpus/count
+// swagger:model Count
+type Count struct {
+	Count int `json:"count" bson:"count"`
 }
 
 var (
@@ -140,7 +146,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 // @Tags        gpus
 // @Produce     json
 // @Param       source      query  string  false  "Provider (e.g., vastai, tensordock, runpod)"
-// @Success     200         {int}  {int}
+// @Success     200         {number}  integer
 // @Failure     400         {string} string  "Bad request"
 // @Failure     502         {string} string  "Upstream error"
 // @Router      /gpus/count [get]

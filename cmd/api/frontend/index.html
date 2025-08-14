@@ -45,6 +45,7 @@
 
         footer { margin-top: 40px; color: var(--muted); text-align: center; }
         .small { font-size: 13px; }
+        .logo{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#60a5fa);box-shadow:0 10px 24px rgba(59,130,246,.3);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px}
 
         @media (max-width: 880px) {
             .hero { grid-template-columns: 1fr; }
@@ -55,7 +56,7 @@
 <div class="wrap">
     <header>
         <div class="brand">
-            <div class="logo" aria-hidden="true"></div>
+            <div class="logo" aria-hidden="true">GF</div>
             <h1>GPU Finder</h1>
         </div>
         <nav>
@@ -92,19 +93,27 @@
 </div>
 
 <script>
-    const API = 'https://gpu-api-891435322100.us-central1.run.app/gpus';
+    const API = 'https://gpufindr.com/gpus';
+    const COUNT_API = 'https://gpufindr.com/gpus/count';
+
+    fetch(COUNT_API)
+        .then(r => r.json())
+    .then(data => {
+        document.getElementById('stat-count').textContent = data.count.toLocaleString();
+    })
+    .catch(() => {
+        document.getElementById('stat-count').textContent = '—';
+    });
     // Load a small sample for stats (default limit=200)
     fetch(API)
         .then(r => r.json())
     .then(rows => {
-        document.getElementById('stat-count').textContent = rows.length.toLocaleString();
         const providers = new Set(rows.map(r => r.source).filter(Boolean));
     const locations = new Set(rows.map(r => r.location).filter(Boolean));
     document.getElementById('stat-providers').textContent = providers.size.toLocaleString();
     document.getElementById('stat-locations').textContent = locations.size.toLocaleString();
     })
     .catch(() => {
-        document.getElementById('stat-count').textContent = '—';
         document.getElementById('stat-providers').textContent = '—';
         document.getElementById('stat-locations').textContent = '—';
     });

@@ -142,7 +142,7 @@ paths:
         "200":
           description: OK
           schema:
-            type: int
+            type: number
         "400":
           description: Bad request
           schema:

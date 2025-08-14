@@ -12,6 +12,7 @@
         nav a{padding:8px 12px;border-radius:10px} nav a:hover{background:#171b25}
         .card{background:var(--elev);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:0 8px 18px rgba(0,0,0,.35)}
         .grid{display:grid;grid-template-columns:1fr;gap:12px}
+        .logo{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#60a5fa);box-shadow:0 10px 24px rgba(59,130,246,.3);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px}
         .controls{display:grid;grid-template-columns:repeat(12,1fr);gap:10px;align-items:end}
         .f{display:flex;flex-direction:column;gap:6px} label{color:var(--muted);font-size:12px}
         input[type=text],input[type=number],select{width:100%;background:#0f1218;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px}
@@ -33,7 +34,7 @@
 <body>
 <div class="wrap">
     <header>
-        <div class="brand"><div class="logo" aria-hidden="true"></div><h1>GPU Finder — Search</h1></div>
+        <div class="brand"><div class="logo" aria-hidden="true">GF</div><h1>GPU Finder — Search</h1></div>
         <nav><a href="index.html">Home</a><a href="about.html">About</a></nav>
     </header>
 
@@ -103,7 +104,7 @@
 </div>
 
 <script>
-    const API='https://gpu-api-891435322100.us-central1.run.app/gpus';
+    const API='https://gpufindr.com/gpus';
     const form=qs('#form'); const statusEl=qs('#status'); const rowsEl=qs('#rows'); const theadRow=qs('#thead-row');
     const prevBtn=qs('#prevBtn'); const nextBtn=qs('#nextBtn'); const pageInfo=qs('#pageInfo');
     const dlSources=qs('#dl-sources'); const dlLocations=qs('#dl-locations');
