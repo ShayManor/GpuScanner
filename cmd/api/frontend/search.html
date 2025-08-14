@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GPU Finder — Search</title>
+    <title>Search</title>
     <style>
         :root{--bg:#0b0c0f;--elev:#12141a;--muted:#9aa3b2;--text:#e7ecf3;--accent:#3b82f6;--radius:12px;--border:#1f2430;--row:#0e1117}
         *{box-sizing:border-box} html,body{height:100%} body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Helvetica Neue,Arial,Noto Sans;color:var(--text);background:var(--bg)} a{color:#9ec3ff;text-decoration:none} a:hover{text-decoration:underline}
@@ -12,6 +12,7 @@
         nav a{padding:8px 12px;border-radius:10px} nav a:hover{background:#171b25}
         .card{background:var(--elev);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:0 8px 18px rgba(0,0,0,.35)}
         .grid{display:grid;grid-template-columns:1fr;gap:12px}
+        .logo{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#60a5fa);box-shadow:0 10px 24px rgba(59,130,246,.3);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px}
         .controls{display:grid;grid-template-columns:repeat(12,1fr);gap:10px;align-items:end}
         .f{display:flex;flex-direction:column;gap:6px} label{color:var(--muted);font-size:12px}
         input[type=text],input[type=number],select{width:100%;background:#0f1218;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px}
@@ -33,7 +34,7 @@
 <body>
 <div class="wrap">
     <header>
-        <div class="brand"><div class="logo" aria-hidden="true"></div><h1>GPU Finder — Search</h1></div>
+        <div class="brand"><div class="logo" aria-hidden="true">GF</div><h1>GPU Finder — Search</h1></div>
         <nav><a href="index.html">Home</a><a href="about.html">About</a></nav>
     </header>
 
@@ -103,7 +104,7 @@
 </div>
 
 <script>
-    const API='https://gpu-api-891435322100.us-central1.run.app/gpus';
+    const API='https://gpufindr.com/gpus';
     const form=qs('#form'); const statusEl=qs('#status'); const rowsEl=qs('#rows'); const theadRow=qs('#thead-row');
     const prevBtn=qs('#prevBtn'); const nextBtn=qs('#nextBtn'); const pageInfo=qs('#pageInfo');
     const dlSources=qs('#dl-sources'); const dlLocations=qs('#dl-locations');
@@ -179,7 +180,7 @@
 
     // Default sort
     const qsSort=getQS('sort');
-    sortColSel.value = (qsSort?qsSort.split('.')[0]:'updated_at');
+    sortColSel.value = (qsSort?qsSort.split('.')[0]:'total_cost_ph');
     sortDirSel.value = (qsSort?qsSort.split('.')[1]:'desc');
 
     // Initialize form from URL
@@ -197,7 +198,17 @@
 
     // Initial render
     renderHeaders();
-    doSearch();
+
+    // Ensure initial search happens after DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            offset = 0;
+            doSearch();
+        });
+    } else {
+        offset = 0;
+        doSearch();
+    }
 
     let inflight;
 
@@ -311,7 +322,7 @@
     function qs(sel){ return document.querySelector(sel); }
     function getQS(key){ const u=new URL(location.href); return u.searchParams.get(key); }
 
-    async function resetForm(){ ['source','location','max_price','min_flopsd'].forEach(id=>qs('#'+id).value=''); sortColSel.value='updated_at'; sortDirSel.value='desc'; }
+    async function resetForm(){ ['source','location','max_price','min_flopsd'].forEach(id=>qs('#'+id).value=''); sortColSel.value='total_cost_ph'; sortDirSel.value='desc'; }
 
 </script>
 </body>

@@ -1,17 +1,4 @@
 steps:
-  # 0) Download dependencies and update go.sum
-  - name: golang:1.24-alpine
-    entrypoint: sh
-    env:
-      - GO111MODULE=on
-    args:
-      - -c
-      - |
-        apk add --no-cache git
-        go get ./...
-        go mod tidy
-
-  # 1) Install swag CLI into a known path (module mode ON)
   - name: golang:1.24-alpine
     entrypoint: sh
     env:
@@ -22,6 +9,17 @@ steps:
       - |
         apk add --no-cache git
         go install github.com/swaggo/swag/cmd/swag@latest
+        /workspace/bin/swag init -g cmd/api/main.go -o ./docs
+
+  # 2) Now tidy with docs present (so deps for docs.go are captured)
+  - name: golang:1.24-alpine
+    entrypoint: sh
+    env:
+      - GO111MODULE=on
+    args:
+      - -c
+      - |
+        go mod tidy
 
 
 

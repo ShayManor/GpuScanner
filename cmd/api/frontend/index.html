@@ -3,19 +3,25 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GPU Finder</title>
-    <meta name="description" content="Simple GPU offers browser" />
+    <title>GPU Finder - Compare GPU Cloud Hosting Prices</title>
+    <meta name="description" content="Find the best GPU hosting deals across multiple cloud providers. Compare prices, performance, and availability for AI/ML workloads." />
     <style>
         :root {
-            --bg: #0b0c0f;           /* near-black */
-            --elev: #12141a;         /* card bg */
-            --muted: #9aa3b2;        /* secondary text */
-            --text: #e7ecf3;         /* primary text */
-            --accent: #3b82f6;       /* blue */
+            --bg: #0b0c0f;
+            --elev: #12141a;
+            --elev-2: #1a1e29;
+            --muted: #9aa3b2;
+            --text: #e7ecf3;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
             --ok: #10b981;
             --danger: #ef4444;
+            --warning: #f59e0b;
             --radius: 14px;
+            --shadow: 0 8px 20px rgba(0,0,0,.35);
+            --shadow-lg: 0 16px 40px rgba(0,0,0,.4);
         }
+
         * { box-sizing: border-box; }
         html, body { height: 100%; }
         body {
@@ -24,30 +30,146 @@
             color: var(--text);
             background: radial-gradient(1200px 600px at 70% -10%, #1a1e29 0, transparent 60%), var(--bg);
         }
-        .wrap { max-width: 1000px; margin: 0 auto; padding: 48px 20px; }
-        header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+
+        .wrap { max-width: 1200px; margin: 0 auto; padding: 48px 20px; }
+
+        /* Header */
+        header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 60px; }
         .brand { display: flex; align-items: center; gap: 12px; }
-        .brand .logo { width: 42px; height: 42px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), #60a5fa); box-shadow: 0 10px 25px rgba(59,130,246,.35); }
-        h1 { font-weight: 700; margin: 0; letter-spacing: .3px; }
-        nav a { color: var(--text); text-decoration: none; padding: 10px 14px; border-radius: 10px; }
-        nav a:hover { background: #1a2030; }
+        .logo {
+            width: 42px; height: 42px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), #60a5fa);
+            box-shadow: 0 10px 25px rgba(59,130,246,.35);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 16px;
+        }
+        h1 { font-weight: 700; margin: 0; letter-spacing: .3px; font-size: 28px; }
+        nav { display: flex; gap: 8px; }
+        nav a {
+            color: var(--text); text-decoration: none; padding: 10px 16px;
+            border-radius: 10px; transition: background .2s;
+        }
+        nav a:hover { background: var(--elev-2); }
 
-        .hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 28px; margin-top: 50px; }
-        .card { background: var(--elev); border: 1px solid #1f2430; border-radius: var(--radius); padding: 22px; box-shadow: 0 8px 20px rgba(0,0,0,.35); }
-        .card h2 { margin: 0 0 8px; font-size: 22px; }
-        .muted { color: var(--muted); }
-        .cta { display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: white; padding: 12px 16px; border-radius: 12px; text-decoration: none; font-weight: 600; margin-top: 14px; box-shadow: 0 8px 20px rgba(59,130,246,.35); }
-        .cta:hover { filter: brightness(1.05); }
+        /* Hero Section */
+        .hero { text-align: center; margin-bottom: 80px; }
+        .hero h2 {
+            font-size: 48px; font-weight: 800; margin: 0 0 16px;
+            background: linear-gradient(135deg, var(--text), var(--muted));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-subtitle {
+            font-size: 20px; color: var(--muted); margin: 0 0 32px;
+            max-width: 600px; margin-left: auto; margin-right: auto;
+        }
+        .cta-group { display: flex; gap: 16px; justify-content: center; align-items: center; }
+        .cta {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: var(--accent); color: white; padding: 14px 24px;
+            border-radius: 12px; text-decoration: none; font-weight: 600;
+            box-shadow: var(--shadow); transition: all .2s;
+        }
+        .cta:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .cta-secondary {
+            background: var(--elev); color: var(--text); border: 1px solid #1f2430;
+        }
+        .cta-secondary:hover { background: var(--elev-2); }
 
-        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
-        .stat { background: #0f1218; border: 1px solid #1f2430; border-radius: 12px; padding: 14px; }
-        .stat .k { font-size: 22px; font-weight: 700; }
+        /* Stats */
+        .stats {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px; margin: 60px 0;
+        }
+        .stat-card {
+            background: var(--elev); border: 1px solid #1f2430;
+            border-radius: var(--radius); padding: 24px; text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .stat-number {
+            font-size: 32px; font-weight: 800; color: var(--accent);
+            margin-bottom: 8px; display: block;
+        }
+        .stat-label { color: var(--muted); font-size: 14px; }
 
-        footer { margin-top: 40px; color: var(--muted); text-align: center; }
-        .small { font-size: 13px; }
+        /* Features Grid */
+        .features {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px; margin-bottom: 60px;
+        }
+        .feature-card {
+            background: var(--elev); border: 1px solid #1f2430;
+            border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow);
+        }
+        .feature-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), #60a5fa);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px; font-size: 20px;
+        }
+        .feature-card h3 { margin: 0 0 12px; font-size: 20px; }
+        .feature-card p { margin: 0; color: var(--muted); line-height: 1.6; }
 
-        @media (max-width: 880px) {
-            .hero { grid-template-columns: 1fr; }
+        /* Providers Section */
+        .providers { margin-bottom: 60px; }
+        .section-title {
+            text-align: center; font-size: 32px; font-weight: 700;
+            margin: 0 0 40px;
+        }
+        .provider-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px; margin-top: 24px;
+        }
+        .provider-badge {
+            background: var(--elev); border: 1px solid #1f2430;
+            border-radius: 10px; padding: 16px; text-align: center;
+            color: var(--muted); font-size: 14px; font-weight: 500;
+        }
+
+        /* API Info */
+        .api-info {
+            background: var(--elev); border: 1px solid #1f2430;
+            border-radius: var(--radius); padding: 32px; margin-bottom: 60px;
+            box-shadow: var(--shadow);
+        }
+        .api-info h3 { margin: 0 0 16px; font-size: 24px; }
+        .api-endpoint {
+            background: #0f1218; border: 1px solid #1f2430;
+            border-radius: 8px; padding: 16px; font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px; overflow-x: auto; margin: 16px 0;
+            color: var(--accent);
+        }
+        .api-features {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px; margin-top: 20px;
+        }
+        .api-feature { display: flex; align-items: center; gap: 8px; }
+        .api-feature::before { content: "✓"; color: var(--ok); font-weight: bold; }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid #1f2430; padding-top: 40px;
+            text-align: center; color: var(--muted);
+        }
+        .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 20px; }
+        .footer-links a { color: var(--muted); text-decoration: none; }
+        .footer-links a:hover { color: var(--text); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h2 { font-size: 36px; }
+            .hero-subtitle { font-size: 18px; }
+            .cta-group { flex-direction: column; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .features { grid-template-columns: 1fr; }
+            .footer-links { flex-direction: column; gap: 12px; }
+        }
+
+        @media (max-width: 480px) {
+            .wrap { padding: 24px 16px; }
+            header { margin-bottom: 40px; }
+            .hero { margin-bottom: 60px; }
+            .stats { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -55,59 +177,147 @@
 <div class="wrap">
     <header>
         <div class="brand">
-            <div class="logo" aria-hidden="true"></div>
+            <div class="logo">GF</div>
             <h1>GPU Finder</h1>
         </div>
         <nav>
             <a href="search.html">Search</a>
             <a href="about.html">About</a>
+            <a href="#api">API</a>
         </nav>
     </header>
 
     <section class="hero">
-        <div class="card">
-            <h2>Find the right GPU host fast</h2>
-            <p class="muted">Browse a clean, accurate catalog of offers aggregated from multiple providers. Filter by provider, location, price, FLOPs per dollar, and sort by any column supported by the API.</p>
-            <a class="cta" href="search.html" aria-label="Go to Search">Open Search →</a>
-            <div class="stats" id="stats">
-                <div class="stat"><div class="k" id="stat-count">—</div><div class="muted small">Offers loaded</div></div>
-                <div class="stat"><div class="k" id="stat-providers">—</div><div class="muted small">Providers</div></div>
-                <div class="stat"><div class="k" id="stat-locations">—</div><div class="muted small">Locations</div></div>
-            </div>
-        </div>
-        <div class="card">
-            <h2>How it works</h2>
-            <ol class="muted">
-                <li>Client calls the read‑only endpoint and renders the results.</li>
-                <li>All filters are passed as query params (no backend required).</li>
-                <li>What you see is what the API returns—no hidden transforms.</li>
-            </ol>
-            <p class="small muted">Endpoint: <code>GET https://gpu-api-891435322100.us-central1.run.app/gpus</code></p>
+        <h2>Find the Perfect GPU Host</h2>
+        <p class="hero-subtitle">Compare real-time prices and performance across multiple cloud GPU providers. Save money and find the best deals for your AI/ML workloads.</p>
+        <div class="cta-group">
+            <a class="cta" href="search.html">Start Searching →</a>
+            <a class="cta cta-secondary" href="#api">View API</a>
         </div>
     </section>
 
+    <section class="stats">
+        <div class="stat-card">
+            <span class="stat-number" id="stat-count">—</span>
+            <div class="stat-label">GPU Offers Available</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number" id="stat-providers">—</span>
+            <div class="stat-label">Cloud Providers</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number" id="stat-locations">—</span>
+            <div class="stat-label">Global Locations</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">24/7</span>
+            <div class="stat-label">Live Updates</div>
+        </div>
+    </section>
+
+    <section class="providers">
+        <h2 class="section-title">Supported Providers</h2>
+        <p style="text-align: center; color: var(--muted); margin-bottom: 32px;">
+            We aggregate data from leading GPU cloud providers to give you comprehensive market coverage.
+        </p>
+        <div class="provider-grid">
+            <div class="provider-badge">Lambda Labs</div>
+            <div class="provider-badge">RunPod</div>
+            <div class="provider-badge">Vast.ai</div>
+            <div class="provider-badge">Tensordock</div>
+        </div>
+    </section>
+
+    <section class="api-info" id="api">
+        <h3>Free API Access</h3>
+        <p class="muted">Access our data programmatically with our simple REST API. No authentication required, no rate limits for reasonable usage.</p>
+
+        <div class="api-endpoint">
+            GET https://gpufindr.com/gpus
+        </div>
+
+        <p style="margin-top: 20px;">
+            <a href="https://gpufindr.com/docs" style="color: var(--accent); text-decoration: none;">View full API documentation →</a>
+        </p>
+    </section>
+
     <footer>
-        <p class="small">Tip: jump straight to <a href="search.html">Search</a> to filter/sort. See <a href="about.html">About</a> for parameter details.</p>
+        <div class="footer-links">
+            <a href="search.html">Search GPUs</a>
+            <a href="about.html">API Docs</a>
+            <a href="mailto:contact@gpufindr.com">Contact</a>
+            <a href="#" onclick="return false;">Privacy</a>
+        </div>
+        <p style="font-size: 14px; margin: 0;">
+            GPU Finder - Compare cloud GPU hosting prices across providers
+        </p>
     </footer>
 </div>
 
 <script>
-    const API = 'https://gpu-api-891435322100.us-central1.run.app/gpus';
-    // Load a small sample for stats (default limit=200)
-    fetch(API)
-        .then(r => r.json())
+    const API = 'https://gpufindr.com/gpus';
+    const COUNT_API = 'https://gpufindr.com/gpus/count';
+
+    // Load total count
+    fetch(COUNT_API)
+        .then(r => {
+        if (!r.ok) throw new Error('Network response was not ok');
+    return r.json();
+    })
+    .then(data => {
+        document.getElementById('stat-count').textContent = data.count.toLocaleString();
+    })
+    .catch(err => {
+        console.error('Error fetching count:', err);
+        document.getElementById('stat-count').textContent = '—';
+    });
+
+    // Load sample data for provider/location stats
+    fetch(API + '?limit=4000')
+        .then(r => {
+        if (!r.ok) throw new Error('Network response was not ok');
+    return r.json();
+    })
     .then(rows => {
-        document.getElementById('stat-count').textContent = rows.length.toLocaleString();
+        console.log('Sample data:', rows.slice(0, 3)); // Debug log
+
         const providers = new Set(rows.map(r => r.source).filter(Boolean));
     const locations = new Set(rows.map(r => r.location).filter(Boolean));
+
+    console.log('Providers found:', Array.from(providers)); // Debug log
+    console.log('Locations found:', Array.from(locations)); // Debug log
+
     document.getElementById('stat-providers').textContent = providers.size.toLocaleString();
     document.getElementById('stat-locations').textContent = locations.size.toLocaleString();
     })
-    .catch(() => {
-        document.getElementById('stat-count').textContent = '—';
+    .catch(err => {
+        console.error('Error fetching GPU data:', err);
         document.getElementById('stat-providers').textContent = '—';
         document.getElementById('stat-locations').textContent = '—';
     });
+</script>
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+        apiKey: "AIzaSyBMVAN0R9ve6E_AJ5pA-HcoNnQELzOXixY",
+        authDomain: "gpuscanner-4721e.firebaseapp.com",
+        projectId: "gpuscanner-4721e",
+        storageBucket: "gpuscanner-4721e.firebasestorage.app",
+        messagingSenderId: "190883386294",
+        appId: "1:190883386294:web:184b6722050b76c6a2e717",
+        measurementId: "G-TE9NJ17Q7Z"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
 </script>
 </body>
 </html>
