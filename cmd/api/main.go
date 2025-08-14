@@ -8,9 +8,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
-	httpSwagger "github.com/swaggo/http-swagger"
-
-	_ "github.com/shaymanor/GpuScanner/docs"
 )
 
 // @title           GPU Catalog API
@@ -19,6 +16,7 @@ import (
 // @BasePath        /
 // @schemes         https http
 func main() {
+	log.Println("Starting API server...")
 	r := chi.NewRouter()
 
 	r.Use(cors.Handler(cors.Options{
@@ -30,19 +28,33 @@ func main() {
 		MaxAge:           300,
 	}))
 
-	// API
+	log.Println("Setting up Health handler...")
+
+	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+
+	log.Println("Setting up gpus handler...")
+
 	r.Get("/gpus", getHandler)
 
 	// Swagger UI at /docs
-	r.Get("/docs/*", httpSwagger.WrapHandler)
+	//r.Get("/docs/*", httpSwagger.WrapHandler)
+
+	log.Println("Setting up SPA handler...")
 
 	h, err := spaHandler()
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Failed to create SPA handler: %v", err)
+	} else {
+		r.Mount("/", h)
 	}
-	r.Mount("/", h)
-
-	addr := ":" + coalesce(os.Getenv("PORT"), "8080")
+	port := "8080"
+	if os.Getenv("PORT") != "" {
+		port = os.Getenv("PORT")
+	}
+	addr := "0.0.0.0:" + port
 	log.Println("listening on", addr)
 	log.Fatal(http.ListenAndServe(addr, r))
 }

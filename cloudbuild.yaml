@@ -1,4 +1,16 @@
 steps:
+  # 0) Download dependencies and update go.sum
+  - name: golang:1.24-alpine
+    entrypoint: sh
+    env:
+      - GO111MODULE=on
+    args:
+      - -c
+      - |
+        apk add --no-cache git
+        go get ./...
+        go mod tidy
+
   # 1) Install swag CLI into a known path (module mode ON)
   - name: golang:1.24-alpine
     entrypoint: sh
@@ -11,6 +23,8 @@ steps:
         apk add --no-cache git
         go install github.com/swaggo/swag/cmd/swag@latest
 
+
+
   # 2) Generate Swagger from annotations (runs the binary directly)
   - name: gcr.io/cloud-builders/go
     env:
@@ -18,16 +32,17 @@ steps:
     entrypoint: /workspace/bin/swag
     args: ["init", "-g", "cmd/api/main.go", "-o", "./docs"]
 
+
   # 3) Build container via buildpacks, target the cmd/api package
   - name: gcr.io/k8s-skaffold/pack
     args:
       [
-        "build", "${_IMG}",
-        "--builder", "gcr.io/buildpacks/builder",
-        "--publish",
-        "--env", "GOOGLE_BUILDABLE=./cmd/api",
-        "--path", "."
+      "build", "${_IMG}",
+      "--builder", "gcr.io/buildpacks/builder",
+      "--publish",
+      "--path", "."
       ]
+
 
   # 4) (Optional) Deploy to Cloud Run as part of the build
   - name: gcr.io/cloud-builders/gcloud
@@ -44,3 +59,6 @@ steps:
 
 substitutions:
   _IMG: us-central1-docker.pkg.dev/gpuscanner/containers/gpu-api:latest
+
+options:
+  logging: CLOUD_LOGGING_ONLY

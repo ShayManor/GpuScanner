@@ -10,6 +10,8 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 func main() {
@@ -18,6 +20,10 @@ func main() {
 	var rows []GPU
 	for _, getter := range getters {
 		rows = append(rows, scan(getter)...)
+	}
+
+	for idx, _ := range rows {
+		rows[idx].Id = uuid.New().String()
 	}
 
 	base := os.Getenv("SUPABASE_URL") + "/rest/v1/gpus"
