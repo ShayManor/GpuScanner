@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	_ "github.com/shaymanor/gpuscanner/cmd/api/docs"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -42,20 +43,7 @@ func main() {
 	r.Get("/gpus", getHandler)
 	r.Get("/gpus/count", countHandler)
 
-	// Swagger UI at /docs
-	r.Get("/docs", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/docs/index.html", http.StatusMovedPermanently)
-	})
-
-	// Serve swagger.json
-	r.Get("/docs/doc.json", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./docs/swagger.json")
-	})
-
-	// Serve Swagger UI
-	r.Get("/docs/*", httpSwagger.Handler(
-		httpSwagger.URL("/docs/doc.json"), // Point to the swagger.json endpoint
-	))
+	r.Get("/docs/*", httpSwagger.WrapHandler)
 
 	log.Println("Setting up SPA handler...")
 
