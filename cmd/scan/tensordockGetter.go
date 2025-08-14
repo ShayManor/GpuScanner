@@ -119,7 +119,7 @@ func tensordockGetter() ([]GPU, error) {
 		upMbps := hn.Location.NetworkSpeedUploadGbps * 1000
 
 		for _, g := range hn.AvailableResources.GPUs {
-			if g.AvailableCount <= 0 {
+			if g.AvailableCount <= 0 || hn.UptimePercentage <= 0.0 {
 				continue
 			}
 			totalFlops, memBWGBs := gpuSpecs(g.V0Name)
