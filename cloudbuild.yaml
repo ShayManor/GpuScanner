@@ -1,13 +1,15 @@
 steps:
-  - name: gcr.io/cloud-builders/go
+  # 0) Download dependencies and update go.sum
+  - name: golang:1.24-alpine
+    entrypoint: sh
     env:
       - GO111MODULE=on
-    args: ["get", "./..."]
-
-  - name: gcr.io/cloud-builders/go
-    env:
-      - GO111MODULE=on
-    args: [ "mod", "tidy" ]
+    args:
+      - -c
+      - |
+        apk add --no-cache git
+        go get ./...
+        go mod tidy
 
   # 1) Install swag CLI into a known path (module mode ON)
   - name: golang:1.24-alpine
