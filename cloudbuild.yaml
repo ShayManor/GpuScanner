@@ -14,11 +14,11 @@ steps:
 
 
   # 2) Generate Swagger from annotations (runs the binary directly)
-  - name: gcr.io/cloud-builders/go
+  - name: golang:1.24-alpine
     env:
       - GO111MODULE=on
     entrypoint: /workspace/bin/swag
-    args: ["init", "-g", "cmd/api/main.go", "-o", "./docs", "--parseDependency", "--parseInternal"]
+    args: ["init", "-g", "cmd/api/main.go", "-o", "./docs"]
 
 
   # 3) Build container via buildpacks, target the cmd/api package
