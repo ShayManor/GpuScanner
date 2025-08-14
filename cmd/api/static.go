@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"embed"
 	"io/fs"
+	"log"
 	"net/http"
 	"path"
 	"strings"
@@ -19,7 +20,13 @@ var frontendFS embed.FS
 func spaHandler() (http.Handler, error) {
 	sub, err := fs.Sub(frontendFS, "frontend")
 	if err != nil {
-		return nil, err
+		log.Printf("Warning: frontend directory not found in embed: %v", err)
+
+		// Return a basic handler instead of failing
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("Frontend not available"))
+		}), nil
 	}
 	files := http.FS(sub)
 	fileServer := http.FileServer(files)
