@@ -1,0 +1,10 @@
+[[build.env]]
+name = "GOOGLE_BUILDABLE"
+value = "./cmd/api"
+
+[build]
+include = [
+  "cmd/api/**",
+  "go.mod",
+  "go.sum"
+]
