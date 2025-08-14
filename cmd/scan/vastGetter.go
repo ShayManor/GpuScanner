@@ -52,7 +52,8 @@ type offer struct {
 }
 
 func fetchVastOffers(limit int) ([]offer, error) {
-	body := fmt.Sprintf(`{"q": {"order": ["dph_total"], "rentable": "true"}}, "limit":%d}`, limit)
+	body := fmt.Sprintf(`{"q":{"limit":%d,"rentable":"true"}}`, limit)
+	fmt.Println(string(body))
 	req, _ := http.NewRequest("PUT", "https://console.vast.ai/api/v0/search/asks/", strings.NewReader(body))
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
@@ -150,7 +151,7 @@ func convertGPUNameToURLFormat(gpuName string) string {
 }
 
 func vastGetter() ([]GPU, error) {
-	sr, err := fetchVastOffers(64)
+	sr, err := fetchVastOffers(4096)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +197,7 @@ func vastGetter() ([]GPU, error) {
 			)
 
 			out = append(out, GPU{
-				Id:                strconv.Itoa(o.ID) + "v",
+				_Id:               strconv.Itoa(o.ID) + "v",
 				Location:          o.Location,
 				Reliability:       o.Reliability,
 				Duration:          o.Duration,
@@ -231,15 +232,6 @@ func vastGetter() ([]GPU, error) {
 			})
 		}
 	}
-	seen := make(map[string]struct{}, len(out))
-	in := out[:0]
-	for _, g := range out {
-		if _, ok := seen[g.Id]; ok {
-			continue
-		}
-		seen[g.Id] = struct{}{}
-		in = append(in, g)
-	}
-	fmt.Println("Found", len(in), "deduped vast GPUs")
-	return in, nil
+	fmt.Println("Found", len(out), "Vast GPUs")
+	return out, nil
 }

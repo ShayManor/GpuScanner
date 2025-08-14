@@ -8,7 +8,8 @@ import (
 
 type GPU struct {
 	// Instance details
-	Id          string  `json:"id" bson:"_id"`
+	Id          string  `json:"id" bson:"id"`   // UUID
+	_Id         string  `json:"_id" bson:"_id"` // Set by providers
 	Location    string  `json:"location" bson:"location"`
 	Reliability float64 `json:"reliability" bson:"reliability"`
 	Duration    float64 `json:"duration_hours" bson:"duration_hours"`
@@ -74,7 +75,7 @@ func (g GPU) toString() string {
 		"  Upload: $%.6f\n"+
 		"  Download: $%.6f"+
 		"\nSource: %s",
-		g.Id,
+		g._Id,
 		g.Name,
 		g.Location,
 		g.Url,

@@ -32,15 +32,15 @@ steps:
     entrypoint: /workspace/bin/swag
     args: ["init", "-g", "cmd/api/main.go", "-o", "./docs"]
 
+
   # 3) Build container via buildpacks, target the cmd/api package
   - name: gcr.io/k8s-skaffold/pack
     args:
       [
-        "build", "${_IMG}",
-        "--builder", "gcr.io/buildpacks/builder",
-        "--publish",
-        "--env", "GOOGLE_ENTRYPOINT=./cmd/api/main",
-        "--path", "."
+      "build", "${_IMG}",
+      "--builder", "gcr.io/buildpacks/builder",
+      "--publish",
+      "--path", "."
       ]
 
 
