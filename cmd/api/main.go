@@ -43,7 +43,7 @@ func main() {
 	r.Get("/gpus", getHandler)
 	r.Get("/gpus/count", countHandler)
 
-	r.Get("/docs/*", httpSwagger.WrapHandler)
+	r.Get("/docs*", httpSwagger.WrapHandler)
 
 	log.Println("Setting up SPA handler...")
 
