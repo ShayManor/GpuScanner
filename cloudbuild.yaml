@@ -40,7 +40,8 @@ steps:
         "build", "${_IMG}",
         "--builder", "gcr.io/buildpacks/builder",
         "--publish",
-        "--path", "."
+        "--path", ".",
+        "--env","BP_KEEP_FILES=docs/**"
       ]
 
 
