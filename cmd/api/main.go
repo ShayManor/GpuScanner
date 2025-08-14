@@ -45,7 +45,16 @@ func main() {
 	r.Get("/docs", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/docs/index.html", http.StatusMovedPermanently)
 	})
-	r.Get("/docs/*", httpSwagger.WrapHandler)
+
+	// Serve swagger.json
+	r.Get("/docs/doc.json", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./docs/swagger.json")
+	})
+
+	// Serve Swagger UI
+	r.Get("/docs/*", httpSwagger.Handler(
+		httpSwagger.URL("/docs/doc.json"), // Point to the swagger.json endpoint
+	))
 
 	log.Println("Setting up SPA handler...")
 
