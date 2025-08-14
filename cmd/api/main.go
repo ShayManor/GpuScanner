@@ -50,8 +50,11 @@ func main() {
 		log.Fatal(err)
 	}
 	r.Mount("/", h)
-
-	addr := ":" + coalesce(os.Getenv("PORT"), "8080")
+	port := "8080"
+	if os.Getenv("PORT") != "" {
+		port = os.Getenv("PORT")
+	}
+	addr := "0.0.0.0:" + port
 	log.Println("listening on", addr)
 	log.Fatal(http.ListenAndServe(addr, r))
 }
