@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 
-	_ "github.com/shaymanor/GpuScanner/docs"
+	_ "github.com/shaymanor/gpuscanner/docs"
 )
 
 // @title           GPU Catalog API
