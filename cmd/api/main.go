@@ -2,6 +2,7 @@
 package main
 
 import (
+	_ "embed"
 	"log"
 	"net/http"
 	"os"
@@ -9,6 +10,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
+
+	rootdocs "github.com/shaymanor/gpuscanner"
 )
 
 // @title           GPU Catalog API
@@ -48,7 +51,8 @@ func main() {
 
 	// Serve swagger.json
 	r.Get("/docs/doc.json", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./docs/swagger.json")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(rootdocs.SwaggerJSON)
 	})
 
 	// Serve Swagger UI
