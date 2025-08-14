@@ -8,6 +8,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	httpSwagger "github.com/swaggo/http-swagger"
+
+	_ "github.com/shaymanor/GpuScanner/docs"
 )
 
 // @title           GPU Catalog API
@@ -38,9 +41,10 @@ func main() {
 	log.Println("Setting up gpus handler...")
 
 	r.Get("/gpus", getHandler)
+	r.Get("/gpus/count", countHandler)
 
 	// Swagger UI at /docs
-	//r.Get("/docs/*", httpSwagger.WrapHandler)
+	r.Get("/docs/*", httpSwagger.WrapHandler)
 
 	log.Println("Setting up SPA handler...")
 
@@ -57,11 +61,4 @@ func main() {
 	addr := "0.0.0.0:" + port
 	log.Println("listening on", addr)
 	log.Fatal(http.ListenAndServe(addr, r))
-}
-
-func coalesce(v, d string) string {
-	if v != "" {
-		return v
-	}
-	return d
 }

@@ -133,3 +133,57 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	_, _ = io.Copy(w, resp.Body)
 }
+
+// countHandler godoc
+// @Summary     Count number of GPUs
+// @Description Returns the total number of GPUs
+// @Tags        gpus
+// @Produce     json
+// @Param       source      query  string  false  "Provider (e.g., vastai, tensordock, runpod)"
+// @Success     200         {int}  {int}
+// @Failure     400         {string} string  "Bad request"
+// @Failure     502         {string} string  "Upstream error"
+// @Router      /gpus/count [get]
+func countHandler(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	v := url.Values{}
+	v.Set("select", "id")
+
+	if s := q.Get("source"); s != "" {
+		v.Set("source", "eq."+s)
+	}
+
+	endpoint := supabaseURL + "/rest/v1/gpus?" + v.Encode()
+	req, _ := http.NewRequestWithContext(r.Context(), "GET", endpoint, nil)
+	req.Header.Set("apikey", anonKey)
+	req.Header.Set("Authorization", "Bearer "+anonKey)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Prefer", "count=exact")
+
+	resp, err := httpc.Do(req)
+	if err != nil {
+		http.Error(w, "upstream error: "+err.Error(), http.StatusBadGateway)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 300 {
+		b, _ := io.ReadAll(resp.Body)
+		http.Error(w, fmt.Sprintf("upstream %s: %s", resp.Status, string(b)), http.StatusBadGateway)
+		return
+	}
+
+	count := resp.Header.Get("Content-Range")
+	if count == "" {
+		http.Error(w, "count not available", http.StatusInternalServerError)
+		return
+	}
+
+	parts := strings.Split(count, "/")
+	if len(parts) != 2 {
+		http.Error(w, "invalid count format", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprintf(w, `{"count": %s}`, parts[1])
+}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GPU Finder — Search</title>
+    <title>Search</title>
     <style>
         :root{--bg:#0b0c0f;--elev:#12141a;--muted:#9aa3b2;--text:#e7ecf3;--accent:#3b82f6;--radius:12px;--border:#1f2430;--row:#0e1117}
         *{box-sizing:border-box} html,body{height:100%} body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Helvetica Neue,Arial,Noto Sans;color:var(--text);background:var(--bg)} a{color:#9ec3ff;text-decoration:none} a:hover{text-decoration:underline}
@@ -179,7 +179,7 @@
 
     // Default sort
     const qsSort=getQS('sort');
-    sortColSel.value = (qsSort?qsSort.split('.')[0]:'updated_at');
+    sortColSel.value = (qsSort?qsSort.split('.')[0]:'total_cost_ph');
     sortDirSel.value = (qsSort?qsSort.split('.')[1]:'desc');
 
     // Initialize form from URL
@@ -197,7 +197,17 @@
 
     // Initial render
     renderHeaders();
-    doSearch();
+
+    // Ensure initial search happens after DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            offset = 0;
+            doSearch();
+        });
+    } else {
+        offset = 0;
+        doSearch();
+    }
 
     let inflight;
 
@@ -311,7 +321,7 @@
     function qs(sel){ return document.querySelector(sel); }
     function getQS(key){ const u=new URL(location.href); return u.searchParams.get(key); }
 
-    async function resetForm(){ ['source','location','max_price','min_flopsd'].forEach(id=>qs('#'+id).value=''); sortColSel.value='updated_at'; sortDirSel.value='desc'; }
+    async function resetForm(){ ['source','location','max_price','min_flopsd'].forEach(id=>qs('#'+id).value=''); sortColSel.value='total_cost_ph'; sortDirSel.value='desc'; }
 
 </script>
 </body>

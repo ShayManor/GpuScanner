@@ -95,6 +95,46 @@
                     }
                 }
             }
+        },
+        "/gpus/count": {
+            "get": {
+                "description": "Returns the total number of GPUs",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gpus"
+                ],
+                "summary": "Count number of GPUs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Provider (e.g., vastai, tensordock, runpod)",
+                        "name": "source",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "int"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "502": {
+                        "description": "Upstream error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
