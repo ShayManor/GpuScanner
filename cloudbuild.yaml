@@ -39,7 +39,7 @@ steps:
         "build", "${_IMG}",
         "--builder", "gcr.io/buildpacks/builder",
         "--publish",
-        "--env", "GOOGLE_BUILDABLE=./cmd/api",
+        "--env", "GOOGLE_ENTRYPOINT=./cmd/api/main",
         "--path", "."
       ]
 
