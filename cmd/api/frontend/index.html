@@ -117,7 +117,7 @@
             margin: 0 0 40px;
         }
         .provider-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 16px; margin-top: 24px;
         }
         .provider-badge {
@@ -221,10 +221,15 @@
             We aggregate data from leading GPU cloud providers to give you comprehensive market coverage.
         </p>
         <div class="provider-grid">
+            <div class="provider-badge">CoreWeave</div>
             <div class="provider-badge">Lambda Labs</div>
             <div class="provider-badge">RunPod</div>
             <div class="provider-badge">Vast.ai</div>
             <div class="provider-badge">Tensordock</div>
+            <div class="provider-badge">Vultr</div>
+            <div class="provider-badge">AWS</div>
+            <div class="provider-badge">GCP</div>
+            <div class="provider-badge">Azure</div>
         </div>
     </section>
 
@@ -287,7 +292,7 @@
     console.log('Providers found:', Array.from(providers)); // Debug log
     console.log('Locations found:', Array.from(locations)); // Debug log
 
-    document.getElementById('stat-providers').textContent = providers.size.toLocaleString();
+    document.getElementById('stat-providers').textContent = 9;
     document.getElementById('stat-locations').textContent = locations.size.toLocaleString();
     })
     .catch(err => {
