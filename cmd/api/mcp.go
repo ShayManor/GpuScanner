@@ -5,12 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
-	"github.com/mark3labs/mcp-go/mcp"    // MCP types
-	"github.com/mark3labs/mcp-go/server" // transport helpers
+	"github.com/mark3labs/mcp-go/mcp"
 )
 
 func fetchCatalogue() ([]GPU, error) {
@@ -81,39 +79,4 @@ func fetchHandler(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolRe
 		}
 	}
 	return mcp.NewToolResultError(fmt.Sprintf("GPU %s not found", id)), nil
-}
-
-// --- main: wire up tools & transports ---------------------------
-func main() {
-	srv := server.NewMCPServer(
-		"GPUFinder-MCP", "0.1.0",
-		server.WithToolCapabilities(true),
-	)
-
-	// search_gpus
-	srv.AddTool(
-		mcp.NewTool("search_gpus",
-			mcp.WithDescription("Search gpufindr catalogue by name/region/price"),
-			mcp.WithString("query", mcp.Description("substring to match in GPU name")),
-			mcp.WithString("region", mcp.Description("exact region code, e.g. us-south-1")),
-			mcp.WithNumber("max_price", mcp.Description("max USD per-hour price")),
-		),
-		searchHandler,
-	)
-
-	// fetch_gpu
-	srv.AddTool(
-		mcp.NewTool("fetch_gpu",
-			mcp.WithDescription("Fetch a single GPU offer by id"),
-			mcp.WithString("id", mcp.Required(), mcp.Description("ID returned from search")),
-		),
-		fetchHandler,
-	)
-
-	handler := server.NewStreamableHTTPServer(srv,
-		server.WithStateLess(false),
-	)
-	http.Handle("/mcp/", http.StripPrefix("/mcp", handler))
-	http.Handle("/mcp", http.StripPrefix("/mcp", handler))
-	log.Fatal(http.ListenAndServe(":8080", nil))
 }

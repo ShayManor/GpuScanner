@@ -7,14 +7,13 @@ import (
 	"testing"
 
 	"github.com/mark3labs/mcp-go/mcp"
-	"github.com/mark3labs/mcp-go/mcptest"
 	"github.com/mark3labs/mcp-go/server"
 )
 
 func TestServerWithTool(t *testing.T) {
 	ctx := context.Background()
 
-	srv, err := mcptest.NewServer(t, server.ServerTool{
+	srv, err := NewServer(t, server.ServerTool{
 		Tool: mcp.NewTool("hello",
 			mcp.WithDescription("Says hello to the provided name, or world."),
 			mcp.WithString("name", mcp.Description("The name to say hello to.")),
@@ -81,7 +80,7 @@ func resultToString(result *mcp.CallToolResult) (string, error) {
 func TestServerWithPrompt(t *testing.T) {
 	ctx := context.Background()
 
-	srv := mcptest.NewUnstartedServer(t)
+	srv := NewUnstartedServer(t)
 	defer srv.Close()
 
 	prompt := mcp.Prompt{
@@ -142,7 +141,7 @@ func TestServerWithPrompt(t *testing.T) {
 func TestServerWithResource(t *testing.T) {
 	ctx := context.Background()
 
-	srv := mcptest.NewUnstartedServer(t)
+	srv := NewUnstartedServer(t)
 	defer srv.Close()
 
 	resource := mcp.Resource{
@@ -191,7 +190,7 @@ func TestServerWithResource(t *testing.T) {
 func TestServerWithResourceTemplate(t *testing.T) {
 	ctx := context.Background()
 
-	srv := mcptest.NewUnstartedServer(t)
+	srv := NewUnstartedServer(t)
 	defer srv.Close()
 
 	template := mcp.NewResourceTemplate(

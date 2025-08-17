@@ -8,6 +8,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/mark3labs/mcp-go/server"
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	_ "github.com/shaymanor/GpuScanner/docs"
@@ -58,6 +60,39 @@ func main() {
 	} else {
 		r.Mount("/", h)
 	}
+	// MCP
+	mcpSrv := server.NewMCPServer(
+		"GPUFinder-MCP", "0.1.0",
+		server.WithToolCapabilities(true),
+	)
+
+	// search_gpus
+	mcpSrv.AddTool(
+		mcp.NewTool("search_gpus",
+			mcp.WithDescription("Search gpufindr catalogue by name/region/price"),
+			mcp.WithString("query", mcp.Description("substring to match in GPU name")),
+			mcp.WithString("region", mcp.Description("exact region code, e.g. us-south-1")),
+			mcp.WithNumber("max_price", mcp.Description("max USD per-hour price")),
+		),
+		searchHandler,
+	)
+
+	// fetch_gpu
+	mcpSrv.AddTool(
+		mcp.NewTool("fetch_gpu",
+			mcp.WithDescription("Fetch a single GPU offer by id"),
+			mcp.WithString("id", mcp.Required(), mcp.Description("ID returned from search")),
+		),
+		fetchHandler,
+	)
+
+	mcpHandler := server.NewStreamableHTTPServer(
+		mcpSrv,
+		server.WithStateLess(false),
+	)
+
+	r.Mount("/mcp", http.StripPrefix("/mcp", mcpHandler))
+
 	port := "8080"
 	if os.Getenv("PORT") != "" {
 		port = os.Getenv("PORT")

@@ -43,4 +43,4 @@ func weatherHandler(ctx context.Context, request mcp.CallToolRequest, args Weath
 }
 ```
 
-See [main.go](./main.go) for more examples.
+See [main.go](main.go) for more examples.
