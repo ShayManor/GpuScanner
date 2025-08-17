@@ -196,6 +196,10 @@ func vastGetter() ([]GPU, error) {
 				o.DPHTotal-0.01,
 			)
 
+			if strings.HasPrefix(o.Location, ", ") {
+				o.Location = o.Location[2:]
+			}
+
 			out = append(out, GPU{
 				_Id:               strconv.Itoa(o.ID) + "v",
 				Location:          o.Location,
