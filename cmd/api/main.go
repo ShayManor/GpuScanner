@@ -44,8 +44,9 @@ func main() {
 	r.Get("/gpus/count", countHandler)
 
 	// Swagger UI at /docs
-	r.Get("/docs", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/docs/index.html", http.StatusMovedPermanently)
+	r.Route("/docs", func(r chi.Router) {
+		r.Get("/", httpSwagger.WrapHandler)  // handles /docs and issues the 301
+		r.Get("/*", httpSwagger.WrapHandler) // serves /docs/{files}
 	})
 	r.Get("/docs/*", httpSwagger.WrapHandler)
 
