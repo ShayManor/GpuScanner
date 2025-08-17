@@ -70,9 +70,9 @@ func main() {
 	mcpSrv.AddTool(
 		mcp.NewTool("search_gpus",
 			mcp.WithDescription("Search gpufindr catalogue by name/region/price"),
-			mcp.WithString("query", mcp.Description("substring to match in GPU name")),
-			mcp.WithString("region", mcp.Description("exact region code, e.g. us-south-1")),
-			mcp.WithNumber("max_price", mcp.Description("max USD per-hour price")),
+			mcp.WithString("query", mcp.Description("substring to match in GPU name. * for any.")),
+			mcp.WithString("region", mcp.Description("exact region code, e.g. us-south-1, * for any")),
+			mcp.WithNumber("max_price", mcp.Description("max USD per-hour price. -1 for any.")),
 		),
 		searchHandler,
 	)

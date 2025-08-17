@@ -27,7 +27,7 @@ func fetchCatalogue() ([]GPU, error) {
 
 func searchHandler(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	q := strings.ToLower(req.GetString("query", ""))
-	region := req.GetString("region", "")
+	region := req.GetString("region", "*")
 	maxP := req.GetFloat("max_price", 0)
 
 	gpus, err := fetchCatalogue()
@@ -37,10 +37,10 @@ func searchHandler(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolR
 
 	var hits []GPU
 	for _, g := range gpus {
-		if q != "" && !strings.Contains(strings.ToLower(g.Name), q) {
+		if q != "" && q != "*" && !strings.Contains(strings.ToLower(g.Name), q) {
 			continue
 		}
-		if region != "" && region != g.Location {
+		if region != "*" && region != g.Location {
 			continue
 		}
 		if maxP > 0 && g.TotalCostPH > maxP {
