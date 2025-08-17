@@ -3,33 +3,163 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GPU Finder — About</title>
+    <title>GPU Finder — Compare Cloud GPU Hosting Prices | AI/ML GPU Rental Comparison</title>
+    <meta name="description" content="Compare cloud GPU hosting prices across providers. Find the best GPU rental deals for AI, machine learning, deep learning, and LLM training. Free GPU price comparison tool." />
+    <meta name="keywords" content="GPU hosting, cloud GPU rental, GPU price comparison, AI training, machine learning GPU, deep learning hosting, LLM training, GPU specs, VRAM comparison, FLOPs per dollar, cloud computing, artificial intelligence" />
+    <meta property="og:title" content="GPU Finder - Compare Cloud GPU Hosting Prices" />
+    <meta property="og:description" content="Find the best GPU rental deals for AI, ML, and deep learning. Compare prices, VRAM, and performance across all major cloud providers." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="GPU Finder - Compare Cloud GPU Hosting Prices" />
+    <meta name="twitter:description" content="Compare GPU rental prices for AI/ML workloads across all major cloud providers." />
     <style>
-        :root { --bg:#0b0c0f; --elev:#12141a; --text:#e7ecf3; --muted:#9aa3b2; --border:#1f2430; --accent:#3b82f6; --radius:12px; }
+        :root {
+            --bg: #0b0c0f;
+            --elev: #12141a;
+            --elev-2: #1a1e29;
+            --text: #e7ecf3;
+            --muted: #9aa3b2;
+            --border: #1f2430;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --ok: #10b981;
+            --warning: #f59e0b;
+            --radius: 14px;
+            --shadow: 0 8px 20px rgba(0,0,0,.35);
+        }
+
         * { box-sizing: border-box; }
-        body { margin: 0; font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans"; color: var(--text); background: var(--bg); }
-        a { color: #9ec3ff; }
-        .wrap { max-width: 900px; margin: 0 auto; padding: 30px 16px 60px; }
-        header { display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; }
-        .brand { display:flex; align-items:center; gap: 10px; }
-        .logo { width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg, var(--accent), #60a5fa); box-shadow: 0 10px 24px rgba(59,130,246,.3); }
-        h1 { font-size: 20px; margin: 0; }
-        nav a { padding: 8px 12px; border-radius: 10px; text-decoration: none; color: var(--text); }
-        nav a:hover { background: #171b25; }
-        .card { background: var(--elev); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: 0 10px 22px rgba(0,0,0,.35); }
-        h2 { margin-top: 0; }
+        body {
+            margin: 0;
+            font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans";
+            color: var(--text);
+            background: radial-gradient(1200px 600px at 70% -10%, #1a1e29 0, transparent 60%), var(--bg);
+        }
+
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { color: var(--accent-hover); }
+
+        .wrap { max-width: 1000px; margin: 0 auto; padding: 40px 20px 80px; }
+
+        header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 50px;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .logo {
+            width: 42px; height: 42px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), #60a5fa);
+            box-shadow: 0 10px 25px rgba(59,130,246,.35);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 16px;
+        }
+        h1 { font-size: 28px; margin: 0; font-weight: 700; }
+        nav { display: flex; gap: 8px; }
+        nav a {
+            padding: 10px 16px; border-radius: 10px; color: var(--text);
+            transition: background .2s;
+        }
+        nav a:hover { background: var(--elev-2); }
+
+        .content { display: grid; gap: 40px; }
+        .card {
+            background: var(--elev); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 32px;
+            box-shadow: var(--shadow);
+        }
+
+        h2 {
+            margin: 0 0 20px; font-size: 24px; font-weight: 700;
+            color: var(--accent);
+        }
+        h3 {
+            margin: 24px 0 12px; font-size: 18px; font-weight: 600;
+            color: var(--text);
+        }
+        h3:first-of-type { margin-top: 0; }
+
+        p { margin: 0 0 16px; line-height: 1.7; }
         .muted { color: var(--muted); }
-        code { background: #0f1218; border: 1px solid var(--border); padding: 2px 6px; border-radius: 8px; }
-        table { width:100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { text-align: left; padding: 8px 8px; border-bottom: 1px solid #1a2130; }
+
+        code {
+            background: #0f1218; border: 1px solid var(--border);
+            padding: 3px 8px; border-radius: 6px; font-size: 14px;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+        }
+
+        .code-block {
+            background: #0f1218; border: 1px solid var(--border);
+            border-radius: 10px; padding: 20px; margin: 20px 0;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 14px; overflow-x: auto;
+            color: var(--accent);
+        }
+
+        table {
+            width: 100%; border-collapse: collapse; margin: 20px 0;
+            background: #0f1218; border-radius: 10px; overflow: hidden;
+        }
+        th, td {
+            text-align: left; padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--elev-2); font-weight: 600;
+            color: var(--accent); font-size: 14px;
+        }
+        td { font-size: 14px; }
+        tr:last-child td { border-bottom: none; }
+
+        .spec-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px; margin: 24px 0;
+        }
+        .spec-card {
+            background: #0f1218; border: 1px solid var(--border);
+            border-radius: 10px; padding: 20px;
+        }
+        .spec-title {
+            font-weight: 600; color: var(--accent); margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        ul { margin: 16px 0; padding-left: 20px; }
+        li { margin-bottom: 8px; line-height: 1.6; }
+
+        .highlight {
+            background: var(--elev-2); border: 1px solid var(--border);
+            border-radius: 10px; padding: 20px; margin: 20px 0;
+        }
+        .highlight h4 {
+            margin: 0 0 12px; color: var(--warning); font-size: 16px;
+        }
+
+        .provider-list {
+            display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0;
+        }
+        .provider-badge {
+            background: var(--elev-2); border: 1px solid var(--border);
+            border-radius: 8px; padding: 8px 14px; font-size: 14px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .wrap { padding: 24px 16px 60px; }
+            header { margin-bottom: 30px; }
+            .card { padding: 24px; }
+            h1 { font-size: 24px; }
+            h2 { font-size: 22px; }
+            nav { flex-direction: column; gap: 4px; }
+            .spec-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 <div class="wrap">
     <header>
         <div class="brand">
-            <div class="logo" aria-hidden="true"></div>
-            <h1>About</h1>
+            <div class="logo">GF</div>
+            <h1>About GPU Finder</h1>
         </div>
         <nav>
             <a href="index.html">Home</a>
@@ -37,57 +167,210 @@
         </nav>
     </header>
 
-    <article class="card">
-        <h2>What is this?</h2>
-        <p>GPU Finder is a minimal, client‑side UI for the read‑only endpoint
-            <code>GET https://gpu-api-891435322100.us-central1.run.app/gpus</code>. It renders the results as returned—no hidden normalization.</p>
+    <div class="content">
+        <section class="card">
+            <h2>What is GPU Finder?</h2>
+            <p>GPU Finder is the leading free tool for comparing cloud GPU hosting prices and rental costs across multiple providers. Instead of manually checking each GPU cloud provider's website, you can instantly compare GPU rental prices, specifications, and availability from all major providers in one comprehensive dashboard.</p>
 
-        <h2>Filtering & Sorting</h2>
-        <p>All filters are passed via query parameters. Supported parameters:</p>
-        <table>
-            <thead><tr><th>Param</th><th>Type</th><th>Meaning</th><th>Example</th></tr></thead>
-            <tbody>
-            <tr><td><code>source</code></td><td>string</td><td>Provider (e.g., <em>vastai</em>, <em>tensordock</em>, <em>runpod</em>)</td><td><code>?source=runpod</code></td></tr>
-            <tr><td><code>location</code></td><td>string</td><td>Case‑insensitive substring match</td><td><code>?location=us-west</code></td></tr>
-            <tr><td><code>max_price</code></td><td>number</td><td>Max <code>total_cost_ph</code> ($ per hour)</td><td><code>?max_price=2.5</code></td></tr>
-            <tr><td><code>min_flopsd</code></td><td>number</td><td>Min <code>flops_per_dollar_ph</code></td><td><code>?min_flopsd=10</code></td></tr>
-            <tr><td><code>sort</code></td><td>string</td><td><code>column.direction</code> (default <code>updated_at.desc</code>)</td><td><code>?sort=total_cost_ph.asc</code></td></tr>
-            <tr><td><code>limit</code></td><td>integer</td><td>1–1000 (default 200)</td><td><code>?limit=200</code></td></tr>
-            <tr><td><code>offset</code></td><td>integer</td><td>Pagination offset</td><td><code>?offset=200</code></td></tr>
-            </tbody>
-        </table>
+            <p>Our platform continuously monitors GPU hosting prices, VRAM specifications, and compute performance metrics from top cloud GPU providers, helping you find the most cost-effective GPU rental solutions for artificial intelligence, machine learning, deep learning, and large language model (LLM) training workloads.</p>
 
-        <h2>Fields</h2>
-        <p>Each item is a <code>GPU</code> object with the fields below (subset shown):</p>
-        <table>
-            <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
-            <tbody>
-            <tr><td><code>id</code></td><td>string</td><td>Instance identifier</td></tr>
-            <tr><td><code>source</code></td><td>string</td><td>Provider name</td></tr>
-            <tr><td><code>location</code></td><td>string</td><td>Region/zone (free‑text)</td></tr>
-            <tr><td><code>name</code></td><td>string</td><td>GPU model label as provided</td></tr>
-            <tr><td><code>num_gpus</code></td><td>integer</td><td>Count of GPUs</td></tr>
-            <tr><td><code>vram_mb</code></td><td>integer</td><td>VRAM in MB (UI shows MB plus an approximate GB conversion MB/1024)</td></tr>
-            <tr><td><code>ram_mb</code></td><td>integer</td><td>System RAM in MB (UI shows MB and ~GB)</td></tr>
-            <tr><td><code>total_flops</code></td><td>number</td><td>Numeric FLOPs value as supplied; unit/precision may vary by provider</td></tr>
-            <tr><td><code>flops_per_dollar_ph</code></td><td>number</td><td>FLOPs per $ per hour</td></tr>
-            <tr><td><code>total_cost_ph</code></td><td>number</td><td>Total $ per hour</td></tr>
-            <tr><td><code>reliability</code></td><td>number</td><td>0–1, displayed as %</td></tr>
-            <tr><td><code>upload_mbps</code>, <code>download_mbps</code></td><td>number</td><td>Network throughput</td></tr>
-            <tr><td><code>url</code></td><td>string</td><td>Link to provider page for the offer</td></tr>
-            <tr><td><code>updated_at</code></td><td>string</td><td>ISO timestamp</td></tr>
-            </tbody>
-        </table>
+            <h3>Why Choose GPU Finder for Cloud GPU Comparison?</h3>
+            <ul>
+                <li><strong>Save Time on GPU Price Comparison:</strong> Compare GPU hosting offers from all major providers instantly</li>
+                <li><strong>Find Cheapest GPU Rentals:</strong> Discover the most cost-effective GPU cloud hosting options</li>
+                <li><strong>Real-time GPU Availability:</strong> Access live pricing and availability data for AI/ML workloads</li>
+                <li><strong>Unbiased GPU Provider Comparison:</strong> Neutral comparison across all major cloud GPU providers</li>
+                <li><strong>GPU Performance Metrics:</strong> Compare FLOPs per dollar, VRAM, and compute efficiency</li>
+            </ul>
 
-        <h2>Notes on correctness</h2>
-        <ul>
-            <li>The UI does not reinterpret metrics; it displays fields as returned. Any provider‑specific meaning (e.g., FLOPs precision) is preserved.</li>
-            <li>VRAM/RAM are shown in MB with a convenience (~GB) conversion using MB/1024.</li>
-            <li>Sorting is delegated to the API via <code>sort</code> whenever possible.</li>
-        </ul>
+            <h3>Supported Cloud GPU Providers</h3>
+            <div class="provider-list">
+                <div class="provider-badge">Lambda Labs</div>
+                <div class="provider-badge">RunPod</div>
+                <div class="provider-badge">Vast.ai</div>
+                <div class="provider-badge">Tensordock</div>
+            </div>
+        </section>
 
-        <p class="muted">This site is static—just open <code>index.html</code> locally or host on any static server (GitHub Pages, Netlify, etc.).</p>
-    </article>
+        <section class="card">
+            <h2>Understanding GPU Specifications for AI/ML Workloads</h2>
+            <p>When selecting cloud GPU hosting for artificial intelligence, machine learning, or deep learning projects, understanding key GPU specifications is crucial for optimizing performance and cost. Here are the essential metrics for GPU rental comparison:</p>
+
+            <div class="spec-grid">
+                <div class="spec-card">
+                    <div class="spec-title">VRAM (Video Memory)</div>
+                    <p class="muted">GPU memory capacity determines model size limits for AI training and inference. More VRAM enables larger neural networks, bigger batch sizes, and complex deep learning models. For LLM training, 24GB+ VRAM is recommended, while 8-16GB works for most computer vision tasks.</p>
+                </div>
+
+                <div class="spec-card">
+                    <div class="spec-title">FLOPs per Dollar (Compute Efficiency)</div>
+                    <p class="muted">This critical metric for GPU price comparison shows computational value. Higher FLOPs per dollar means better performance per cost, essential for budget-conscious AI training and machine learning workloads.</p>
+                </div>
+
+                <div class="spec-card">
+                    <div class="spec-title">System RAM for ML Workloads</div>
+                    <p class="muted">System memory supports data preprocessing, dataset loading, and multi-process AI training. Sufficient RAM prevents bottlenecks when working with large datasets for deep learning and machine learning applications.</p>
+                </div>
+
+                <div class="spec-card">
+                    <div class="spec-title">GPU Reliability Score</div>
+                    <p class="muted">Reliability percentage indicates instance stability for long-running AI training jobs. Higher reliability scores are crucial for expensive deep learning experiments and production ML inference workloads.</p>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <h4>💡 GPU Selection Pro Tip</h4>
+                <p class="muted">For training large language models and transformer architectures, prioritize VRAM capacity over raw compute. For AI inference and smaller models, optimize for FLOPs per dollar and reliability.</p>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>How to Choose the Right GPU for AI, ML, and Deep Learning</h2>
+
+            <h3>GPU Requirements by AI/ML Workload Type</h3>
+            <ul>
+                <li><strong>Small Neural Networks (ResNet, BERT-base):</strong> 8-16GB VRAM, focus on cost-effective GPU hosting</li>
+                <li><strong>Large Language Models (LLMs, GPT, Claude):</strong> 24GB+ VRAM, high reliability for extended training</li>
+                <li><strong>Computer Vision & CNN Training:</strong> 16GB+ VRAM, high memory bandwidth for image datasets</li>
+                <li><strong>AI Inference & Production ML:</strong> Optimize for FLOPs per dollar, prioritize reliable GPU hosting</li>
+                <li><strong>Research & AI Experimentation:</strong> Budget-friendly GPU rentals, spot instances acceptable</li>
+                <li><strong>Deep Learning Research:</strong> High VRAM capacity, flexible GPU cloud hosting options</li>
+            </ul>
+
+            <h3>Geographic Considerations for Cloud GPU Selection</h3>
+            <ul>
+                <li><strong>Data Compliance & Privacy:</strong> Choose GPU hosting regions meeting regulatory requirements</li>
+                <li><strong>Latency for AI Applications:</strong> Select cloud GPU locations near end users for real-time ML inference</li>
+                <li><strong>Cost Optimization:</strong> Compare regional GPU pricing variations across providers</li>
+                <li><strong>Bandwidth & Data Transfer:</strong> Consider network costs for large dataset uploads/downloads</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>Free GPU Price Comparison API for Developers</h2>
+            <p>Access our comprehensive cloud GPU pricing database programmatically with our free, public API. Perfect for building AI/ML cost optimization tools, GPU availability monitoring, and automated cloud resource selection. No authentication required for basic usage.</p>
+
+            <div class="code-block">
+                GET https://gpufindr.com/gpus
+            </div>
+
+            <h3>Query Parameters</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Example</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><code>source</code></td>
+                    <td>string</td>
+                    <td>Filter by provider name</td>
+                    <td><code>?source=runpod</code></td>
+                </tr>
+                <tr>
+                    <td><code>location</code></td>
+                    <td>string</td>
+                    <td>Filter by location (substring match)</td>
+                    <td><code>?location=us-west</code></td>
+                </tr>
+                <tr>
+                    <td><code>max_price</code></td>
+                    <td>number</td>
+                    <td>Maximum price per hour in USD</td>
+                    <td><code>?max_price=2.50</code></td>
+                </tr>
+                <tr>
+                    <td><code>min_flopsd</code></td>
+                    <td>number</td>
+                    <td>Minimum FLOPs per dollar per hour</td>
+                    <td><code>?min_flopsd=10</code></td>
+                </tr>
+                <tr>
+                    <td><code>sort</code></td>
+                    <td>string</td>
+                    <td>Sort by field (format: <code>field.direction</code>)</td>
+                    <td><code>?sort=total_cost_ph.asc</code></td>
+                </tr>
+                <tr>
+                    <td><code>limit</code></td>
+                    <td>integer</td>
+                    <td>Number of results (1-1000, default 200)</td>
+                    <td><code>?limit=100</code></td>
+                </tr>
+                <tr>
+                    <td><code>offset</code></td>
+                    <td>integer</td>
+                    <td>Pagination offset</td>
+                    <td><code>?offset=200</code></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h3>Response Fields</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr><td><code>id</code></td><td>string</td><td>Unique instance identifier</td></tr>
+                <tr><td><code>source</code></td><td>string</td><td>Provider name</td></tr>
+                <tr><td><code>location</code></td><td>string</td><td>Geographic location/region</td></tr>
+                <tr><td><code>name</code></td><td>string</td><td>GPU model name</td></tr>
+                <tr><td><code>num_gpus</code></td><td>integer</td><td>Number of GPUs in instance</td></tr>
+                <tr><td><code>vram_mb</code></td><td>integer</td><td>Video memory in megabytes</td></tr>
+                <tr><td><code>ram_mb</code></td><td>integer</td><td>System RAM in megabytes</td></tr>
+                <tr><td><code>total_flops</code></td><td>number</td><td>Total floating point operations per second</td></tr>
+                <tr><td><code>flops_per_dollar_ph</code></td><td>number</td><td>FLOPs per dollar per hour</td></tr>
+                <tr><td><code>total_cost_ph</code></td><td>number</td><td>Total cost per hour in USD</td></tr>
+                <tr><td><code>reliability</code></td><td>number</td><td>Reliability score (0-1)</td></tr>
+                <tr><td><code>upload_mbps</code></td><td>number</td><td>Upload bandwidth in Mbps</td></tr>
+                <tr><td><code>download_mbps</code></td><td>number</td><td>Download bandwidth in Mbps</td></tr>
+                <tr><td><code>url</code></td><td>string</td><td>Link to provider's page for this offer</td></tr>
+                <tr><td><code>updated_at</code></td><td>string</td><td>Last update timestamp (ISO format)</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Example Request</h3>
+            <div class="code-block">
+                # Get cheapest RTX 4090 instances under $3/hour
+                curl "https://gpufindr.com/gpus?max_price=3&sort=total_cost_ph.asc&limit=10"
+            </div>
+
+            <h3>Count Endpoint</h3>
+            <p>Get the total number of available offers:</p>
+            <div class="code-block">
+                GET https://gpufindr.com/gpus/count
+                # Returns: {"count": 1234}
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Getting Started with GPU Cloud Hosting Comparison</h2>
+            <p>Ready to find the perfect GPU rental for your AI, machine learning, or deep learning project? Follow these steps to optimize your cloud GPU selection and costs:</p>
+
+            <ol>
+                <li><strong>Define Your AI/ML Requirements:</strong> Determine VRAM needs, compute requirements, and budget constraints</li>
+                <li><strong>Use Our GPU Search Tool:</strong> Filter by VRAM, price, provider, and location to find suitable options</li>
+                <li><strong>Compare GPU Hosting Offers:</strong> Analyze price per hour, FLOPs per dollar, and reliability scores</li>
+                <li><strong>Verify with Cloud Provider:</strong> Visit the provider's website to confirm current pricing and availability</li>
+                <li><strong>Start Your AI Training:</strong> Launch your machine learning workloads on the selected GPU instance</li>
+            </ol>
+
+            <p style="margin-top: 30px;">
+                <a href="https://gpufindr.com/search.html" style="display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: white; padding: 12px 20px; border-radius: 10px; font-weight: 600; text-decoration: none;">
+                    Compare GPU Prices Now →
+                </a>
+            </p>
+        </section>
+    </div>
 </div>
 </body>
 </html>
