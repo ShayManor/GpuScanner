@@ -90,8 +90,10 @@ func main() {
 		mcpSrv,
 		server.WithStateLess(false),
 	)
+	sseSrv := server.NewSSEServer(mcpSrv)
 
 	r.Mount("/mcp", http.StripPrefix("/mcp", mcpHandler))
+	r.Mount("/mcp", http.StripPrefix("/mcp/sse", sseSrv))
 
 	port := "8080"
 	if os.Getenv("PORT") != "" {
