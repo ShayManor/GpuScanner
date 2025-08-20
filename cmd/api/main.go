@@ -88,16 +88,12 @@ func main() {
 
 	sse := server.NewSSEServer(
 		mcpSrv,
-		// tell it you live under /mcp
-		server.WithStaticBasePath("/mcp"),
-		// optional but helpful behind proxies
-		server.WithBaseURL("https://gpufindr.com"),
-		// make endpoints explicit:
-		server.WithSSEEndpoint("/mcp/sse"),
-		server.WithMessageEndpoint("/mcp/message"),
-		// make it return a path, not a duplicate full URL
+		server.WithStaticBasePath("/mcp"), // single base path
+		server.WithSSEEndpoint("/sse"),
+		server.WithMessageEndpoint("/message"),
 		server.WithUseFullURLForMessageEndpoint(false),
 	)
+
 	r.Mount("/mcp/sse", sse.SSEHandler())
 	r.Mount("/mcp/message", sse.MessageHandler())
 
