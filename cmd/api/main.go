@@ -57,6 +57,8 @@ func main() {
 	mcpSrv := server.NewMCPServer(
 		"GPUFinder-MCP", "0.1.0",
 		server.WithToolCapabilities(true),
+		server.WithLogging(),
+		server.WithRecovery(),
 	)
 
 	// search_gpus

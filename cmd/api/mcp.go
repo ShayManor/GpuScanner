@@ -60,16 +60,31 @@ func searchHandler(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolR
 		hits = append(hits, g)
 	}
 
-	var numResults int = limit
-	if len(hits) > limit {
-		numResults = len(hits)
+	// Calculate safe slice bounds
+	start := offset
+	if start > len(hits) {
+		start = len(hits)
 	}
-	summary := fmt.Sprintf("Found %d offers; returning %d (offset=%d, limit=%d).", len(hits), numResults, offset, limit)
+	end := offset + limit
+	if end > len(hits) {
+		end = len(hits)
+	}
+
+	// Get the actual slice
+	var results []GPU
+	if start < len(hits) {
+		results = hits[start:end]
+	} else {
+		results = []GPU{} // empty if offset is beyond array
+	}
+
+	summary := fmt.Sprintf("Found %d offers; returning %d (offset=%d, limit=%d).",
+		len(hits), len(results), offset, limit)
 
 	buf := &bytes.Buffer{}
 	encoder := json.NewEncoder(buf)
-	encoder.SetEscapeHTML(false) // Disable HTML escaping
-	if err := encoder.Encode(hits[offset : limit+offset]); err != nil {
+	encoder.SetEscapeHTML(false)
+	if err := encoder.Encode(results); err != nil {
 		return mcp.NewToolResultError("failed to marshal results"), nil
 	}
 	js := buf.Bytes()
