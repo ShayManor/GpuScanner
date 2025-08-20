@@ -88,7 +88,7 @@ func main() {
 
 	mcpHandler := server.NewStreamableHTTPServer(
 		mcpSrv,
-		server.WithStateLess(false),
+		server.WithStateLess(true),
 	)
 	sseSrv := server.NewSSEServer(mcpSrv, server.WithStaticBasePath("/mcp"))
 
