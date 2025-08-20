@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -15,6 +16,15 @@ import (
 
 	_ "github.com/shaymanor/GpuScanner/docs"
 )
+
+func sseMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-cache")
+		w.Header().Set("Connection", "keep-alive")
+		w.Header().Set("X-Accel-Buffering", "no") // Disable nginx buffering
+		next.ServeHTTP(w, r)
+	})
+}
 
 // @title           GPU Catalog API
 // @version         1.0
@@ -90,10 +100,11 @@ func main() {
 		server.WithMessageEndpoint("/message"),
 		server.WithBaseURL("https://gpufindr.com"),
 		server.WithUseFullURLForMessageEndpoint(true), // some clients require absolute
+		server.WithKeepAliveInterval(30*time.Second),
 	)
 
-	r.Mount("/mcp/sse", sse.SSEHandler())
-	r.Mount("/mcp/message", sse.MessageHandler())
+	r.Handle("/mcp/sse", sseMiddleware(sse.SSEHandler()))
+	r.Handle("/mcp/message", sse.MessageHandler())
 
 	log.Println("Setting up SPA handler...")
 
