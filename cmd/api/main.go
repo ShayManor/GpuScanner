@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -26,7 +27,7 @@ func main() {
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "OPTIONS", "POST"},
 		AllowedHeaders:   []string{"*"},
 		ExposedHeaders:   []string{"Content-Length"},
 		AllowCredentials: false,
@@ -52,14 +53,6 @@ func main() {
 	})
 	r.Get("/docs/*", httpSwagger.WrapHandler)
 
-	log.Println("Setting up SPA handler...")
-
-	h, err := spaHandler()
-	if err != nil {
-		log.Printf("Failed to create SPA handler: %v", err)
-	} else {
-		r.Mount("/", h)
-	}
 	// MCP
 	mcpSrv := server.NewMCPServer(
 		"GPUFinder-MCP", "0.1.0",
@@ -88,14 +81,39 @@ func main() {
 
 	sse := server.NewSSEServer(
 		mcpSrv,
-		server.WithStaticBasePath("/mcp"), // single base path
+		server.WithStaticBasePath("/mcp"),
 		server.WithSSEEndpoint("/sse"),
 		server.WithMessageEndpoint("/message"),
-		server.WithUseFullURLForMessageEndpoint(false),
+		server.WithBaseURL("https://gpufindr.com"),
+		server.WithUseFullURLForMessageEndpoint(true), // some clients require absolute
 	)
 
 	r.Mount("/mcp/sse", sse.SSEHandler())
 	r.Mount("/mcp/message", sse.MessageHandler())
+
+	log.Println("Setting up SPA handler...")
+
+	h, err := spaHandler()
+	if err != nil {
+		log.Printf("Failed to create SPA handler: %v", err)
+	} else {
+		// GET-only + path guard so /mcp/* never falls through to the SPA
+		spa := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.Method != http.MethodGet && req.Method != http.MethodHead {
+				http.NotFound(w, req)
+				return
+			}
+			if strings.HasPrefix(req.URL.Path, "/mcp/") ||
+				strings.HasPrefix(req.URL.Path, "/gpus") ||
+				strings.HasPrefix(req.URL.Path, "/docs/") {
+				http.NotFound(w, req)
+				return
+			}
+			h.ServeHTTP(w, req)
+		})
+		r.Handle("/*", spa) // mount SPA LAST
+		r.Handle("/", spa)
+	}
 
 	port := "8080"
 	if os.Getenv("PORT") != "" {
