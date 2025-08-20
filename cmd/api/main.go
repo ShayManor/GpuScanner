@@ -90,7 +90,7 @@ func main() {
 		mcpSrv,
 		server.WithStateLess(false),
 	)
-	sseSrv := server.NewSSEServer(mcpSrv)
+	sseSrv := server.NewSSEServer(mcpSrv, server.WithStaticBasePath("/mcp"))
 
 	r.Mount("/mcp", http.StripPrefix("/mcp", mcpHandler))
 	r.Mount("/mcp/sse", http.StripPrefix("/mcp/sse", sseSrv))
