@@ -86,14 +86,20 @@ func main() {
 		fetchHandler,
 	)
 
-	mcpHandler := server.NewStreamableHTTPServer(
+	sse := server.NewSSEServer(
 		mcpSrv,
-		server.WithStateLess(true),
+		// tell it you live under /mcp
+		server.WithStaticBasePath("/mcp"),
+		// optional but helpful behind proxies
+		server.WithBaseURL("https://gpufindr.com"),
+		// make endpoints explicit:
+		server.WithSSEEndpoint("/mcp/sse"),
+		server.WithMessageEndpoint("/mcp/message"),
+		// make it return a path, not a duplicate full URL
+		server.WithUseFullURLForMessageEndpoint(false),
 	)
-	sseSrv := server.NewSSEServer(mcpSrv, server.WithStaticBasePath("/mcp"))
-
-	r.Mount("/mcp", http.StripPrefix("/mcp", mcpHandler))
-	r.Mount("/mcp/sse", http.StripPrefix("/mcp/sse", sseSrv))
+	r.Mount("/mcp/sse", sse.SSEHandler())
+	r.Mount("/mcp/message", sse.MessageHandler())
 
 	port := "8080"
 	if os.Getenv("PORT") != "" {
