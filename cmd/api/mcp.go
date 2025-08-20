@@ -29,6 +29,17 @@ func searchHandler(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolR
 	q := strings.ToLower(req.GetString("query", ""))
 	region := req.GetString("region", "*")
 	maxP := req.GetFloat("max_price", 0)
+	limit := req.GetInt("limit", 50)
+	if limit <= 0 {
+		limit = 50
+	}
+	if limit > 200 {
+		limit = 200
+	}
+	offset := req.GetInt("offset", 0)
+	if offset < 0 {
+		offset = 0
+	}
 
 	gpus, err := fetchCatalogue()
 	if err != nil {
@@ -49,18 +60,24 @@ func searchHandler(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolR
 		hits = append(hits, g)
 	}
 
-	fmt.Printf("Found %d hits\n", len(hits))
+	var numResults int = limit
+	if len(hits) > limit {
+		numResults = len(hits)
+	}
+	summary := fmt.Sprintf("Found %d offers; returning %d (offset=%d, limit=%d).", len(hits), numResults, offset, limit)
 
 	buf := &bytes.Buffer{}
 	encoder := json.NewEncoder(buf)
 	encoder.SetEscapeHTML(false) // Disable HTML escaping
-	if err := encoder.Encode(hits); err != nil {
+	if err := encoder.Encode(hits[offset : limit+offset]); err != nil {
 		return mcp.NewToolResultError("failed to marshal results"), nil
 	}
 	js := buf.Bytes()
 	js = bytes.TrimSuffix(js, []byte("\n"))
 
-	return mcp.NewToolResultStructured(json.RawMessage(js), ""), nil
+	res := mcp.NewToolResultText(summary + "\n\n" + string(js))
+
+	return res, nil
 }
 
 func fetchHandler(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {

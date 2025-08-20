@@ -27,7 +27,7 @@ func main() {
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET", "OPTIONS", "POST"},
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		ExposedHeaders:   []string{"Content-Length"},
 		AllowCredentials: false,
@@ -66,6 +66,8 @@ func main() {
 			mcp.WithString("query", mcp.Description("substring to match in GPU name. * for any.")),
 			mcp.WithString("region", mcp.Description("exact region code, e.g. us-south-1, * for any")),
 			mcp.WithNumber("max_price", mcp.Description("max USD per-hour price. -1 for any.")),
+			mcp.WithNumber("limit", mcp.Description("max rows to return (default 50, max 200)")),
+			mcp.WithNumber("offset", mcp.Description("starting row (default 0)")),
 		),
 		searchHandler,
 	)
