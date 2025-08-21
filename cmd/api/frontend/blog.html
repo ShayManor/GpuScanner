@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blog - GPU Finder</title>
+    <meta name="description" content="Latest news, insights, and updates from GPU Finder. Stay informed about GPU cloud hosting trends and market analysis." />
+    <style>
+        :root {
+            --bg: #0b0c0f;
+            --elev: #12141a;
+            --elev-2: #1a1e29;
+            --muted: #9aa3b2;
+            --text: #e7ecf3;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --ok: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --radius: 14px;
+            --shadow: 0 8px 20px rgba(0,0,0,.35);
+            --shadow-lg: 0 16px 40px rgba(0,0,0,.4);
+        }
+
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            font: 15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+            color: var(--text);
+            background: radial-gradient(1200px 600px at 70% -10%, #1a1e29 0, transparent 60%), var(--bg);
+        }
+
+        .wrap { max-width: 800px; margin: 0 auto; padding: 48px 20px; }
+
+        /* Header */
+        header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 60px; }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .logo {
+            width: 42px; height: 42px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), #60a5fa);
+            box-shadow: 0 10px 25px rgba(59,130,246,.35);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 16px;
+        }
+        .brand-title { font-weight: 700; margin: 0; letter-spacing: .3px; font-size: 28px; }
+        nav { display: flex; gap: 8px; }
+        nav a {
+            color: var(--text); text-decoration: none; padding: 10px 16px;
+            border-radius: 10px; transition: background .2s;
+        }
+        nav a:hover { background: var(--elev-2); }
+
+        /* Page Header */
+        .page-header { text-align: center; margin-bottom: 60px; }
+        .page-title {
+            font-size: 48px; font-weight: 800; margin: 0 0 16px;
+            background: linear-gradient(135deg, var(--text), var(--muted));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .page-subtitle {
+            font-size: 20px; color: var(--muted); margin: 0;
+            max-width: 600px; margin-left: auto; margin-right: auto;
+        }
+
+        /* Loading State */
+        .loading-container {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; min-height: 300px; color: var(--muted);
+        }
+        .loading-spinner {
+            width: 32px; height: 32px; border: 3px solid var(--elev-2);
+            border-top: 3px solid var(--accent); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 16px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Blog Posts */
+        .blog-posts { display: flex; flex-direction: column; gap: 40px; }
+        .blog-post {
+            background: var(--elev); border: 1px solid #1f2430;
+            border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow);
+            transition: all .2s;
+        }
+        .blog-post:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: #2a3441;
+        }
+
+        .post-header {
+            margin-bottom: 24px; padding-bottom: 20px;
+            border-bottom: 1px solid #1f2430;
+        }
+        .post-title {
+            font-size: 28px; font-weight: 700; margin: 0 0 8px;
+            color: var(--text); line-height: 1.3;
+        }
+        .post-meta {
+            color: var(--muted); font-size: 14px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .post-date::before {
+            content: "📅"; margin-right: 6px;
+        }
+
+        /* Blog Content */
+        .post-content {
+            line-height: 1.7; color: var(--text);
+        }
+        .post-content h1, .post-content h2, .post-content h3 {
+            color: var(--text); margin: 24px 0 16px 0;
+            font-weight: 600;
+        }
+        .post-content h1 { font-size: 32px; }
+        .post-content h2 { font-size: 24px; }
+        .post-content h3 { font-size: 20px; }
+        .post-content p {
+            margin: 16px 0; line-height: 1.7;
+        }
+        .post-content strong {
+            color: var(--text); font-weight: 600;
+        }
+        .post-content em {
+            font-style: italic; color: var(--muted);
+        }
+        .post-content code {
+            background: var(--elev-2); color: var(--accent);
+            padding: 2px 6px; border-radius: 4px;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 14px;
+        }
+        .post-content pre {
+            background: var(--elev-2); border: 1px solid #1f2430;
+            border-radius: 8px; padding: 16px; overflow-x: auto;
+            margin: 20px 0;
+        }
+        .post-content pre code {
+            background: none; padding: 0;
+        }
+        .post-content blockquote {
+            border-left: 4px solid var(--accent);
+            padding-left: 20px; margin: 20px 0;
+            color: var(--muted); font-style: italic;
+        }
+        .post-content ul, .post-content ol {
+            margin: 16px 0; padding-left: 24px;
+        }
+        .post-content li {
+            margin: 8px 0; line-height: 1.6;
+        }
+        .post-content a {
+            color: var(--accent); text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color .2s;
+        }
+        .post-content a:hover {
+            border-bottom-color: var(--accent);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center; padding: 60px 20px;
+            color: var(--muted);
+        }
+        .empty-icon {
+            font-size: 48px; margin-bottom: 16px;
+        }
+        .empty-title {
+            font-size: 24px; font-weight: 600;
+            margin: 0 0 12px; color: var(--text);
+        }
+        .empty-message {
+            font-size: 16px; line-height: 1.5;
+        }
+
+        /* Error State */
+        .error-state {
+            background: var(--elev); border: 1px solid var(--danger);
+            border-radius: var(--radius); padding: 32px; text-align: center;
+            color: var(--danger);
+        }
+        .error-icon {
+            font-size: 48px; margin-bottom: 16px;
+        }
+        .error-title {
+            font-size: 20px; font-weight: 600; margin: 0 0 12px;
+        }
+        .error-message {
+            color: var(--muted); line-height: 1.5;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid #1f2430; padding-top: 40px; margin-top: 80px;
+            text-align: center; color: var(--muted);
+        }
+        .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 20px; }
+        .footer-links a { color: var(--muted); text-decoration: none; }
+        .footer-links a:hover { color: var(--text); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .wrap { padding: 24px 16px; }
+            .page-title { font-size: 36px; }
+            .page-subtitle { font-size: 18px; }
+            .post-title { font-size: 24px; }
+            .blog-post { padding: 24px; }
+            .footer-links { flex-direction: column; gap: 12px; }
+        }
+
+        @media (max-width: 480px) {
+            header { margin-bottom: 40px; }
+            .page-header { margin-bottom: 40px; }
+            .brand-title { font-size: 24px; }
+            .nav { flex-direction: column; gap: 4px; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <div class="brand">
+            <div class="logo">GF</div>
+            <h1 class="brand-title">GPU Finder</h1>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="search.html">Search</a>
+            <a href="blog.html">Blog</a>
+            <a href="https://gpufindr.com/docs">API</a>
+        </nav>
+    </header>
+
+    <section class="page-header">
+        <h1 class="page-title">Blog</h1>
+        <p class="page-subtitle">Latest insights, market analysis, and updates from the GPU cloud hosting world.</p>
+    </section>
+
+    <main class="blog-container" id="blog-container">
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>Loading blog posts...</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="search.html">Search GPUs</a>
+            <a href="https://gpufindr.com/docs">API Docs</a>
+            <a href="mailto:contact@gpufindr.com">Contact</a>
+        </div>
+        <p style="font-size: 14px; margin: 0;">
+            GPU Finder - Compare cloud GPU hosting prices across providers
+        </p>
+    </footer>
+</div>
+
+<script>
+    const BLOG_API = 'https://gpufindr.com/blog';
+
+    // Simple markdown parser for basic formatting
+    function parseMarkdown(text) {
+        if (!text) return '';
+
+        return text
+            // Headers (# ## ###)
+            .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+            .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+            .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+
+            // Bold (**text**)
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+
+            // Italic (*text*)
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+
+            // Code (`code`)
+            .replace(/`(.*?)`/g, '<code>$1</code>')
+
+            // Code blocks (```code```)
+            .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+
+            // Links [text](url)
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+
+            // Blockquotes (> text)
+            .replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>')
+
+            // Line breaks
+            .replace(/\n\n/g, '</p><p>')
+            .replace(/\n/g, '<br>')
+
+            // Wrap in paragraphs
+            .replace(/^(.+)/, '<p>$1')
+            .replace(/(.+)$/, '$1</p>')
+
+            // Clean up empty paragraphs
+            .replace(/<p><\/p>/g, '')
+            .replace(/<p><h([1-6])>/g, '<h$1>')
+            .replace(/<\/h([1-6])><\/p>/g, '</h$1>')
+            .replace(/<p><blockquote>/g, '<blockquote>')
+            .replace(/<\/blockquote><\/p>/g, '</blockquote>')
+            .replace(/<p><pre>/g, '<pre>')
+            .replace(/<\/pre><\/p>/g, '</pre>');
+    }
+
+    function formatDate(dateString) {
+        try {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        } catch {
+            return 'Recent';
+        }
+    }
+
+    function createBlogPost(post, index) {
+        const formattedContent = parseMarkdown(post.data || '');
+        const postDate = formatDate(post.date);
+
+        return `
+            <article class="blog-post">
+                <header class="post-header">
+                    <h2 class="post-title">${post.title || 'Untitled Post'}</h2>
+                    <div class="post-meta">
+                        <span class="post-date">${postDate}</span>
+                    </div>
+                </header>
+                <div class="post-content">
+                    ${formattedContent}
+                </div>
+            </article>
+        `;
+    }
+
+    function showError(message = 'Failed to load blog posts') {
+        const container = document.getElementById('blog-container');
+        container.innerHTML = `
+            <div class="error-state">
+                <div class="error-icon">⚠️</div>
+                <h3 class="error-title">Unable to Load Blog Posts</h3>
+                <p class="error-message">${message}. Please try again later.</p>
+            </div>
+        `;
+    }
+
+    function showEmptyState() {
+        const container = document.getElementById('blog-container');
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📝</div>
+                <h3 class="empty-title">No Blog Posts Yet</h3>
+                <p class="empty-message">We're working on some great content for you.<br>Check back soon for the latest GPU market insights!</p>
+            </div>
+        `;
+    }
+
+    // Load blog posts
+    async function loadBlogPosts() {
+        try {
+            console.log('Fetching blog posts from:', BLOG_API);
+
+            const response = await fetch(BLOG_API);
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const posts = await response.json();
+            console.log('Blog posts loaded:', posts);
+
+            const container = document.getElementById('blog-container');
+
+            if (!Array.isArray(posts) || posts.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            // Filter out invalid posts and create HTML
+            const validPosts = posts.filter(post => post && (post.title || post.data));
+
+            if (validPosts.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            const blogHTML = validPosts
+                .map((post, index) => createBlogPost(post, index))
+        .join('');
+
+            container.innerHTML = `<div class="blog-posts">${blogHTML}</div>`;
+
+        } catch (error) {
+            console.error('Error loading blog posts:', error);
+            showError(error.message);
+        }
+    }
+
+    // Initialize blog when page loads
+    document.addEventListener('DOMContentLoaded', loadBlogPosts);
+</script>
+</body>
+</html>
