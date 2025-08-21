@@ -136,12 +136,13 @@
         {key:'disk_cost_ph', label:'Disk $/h', align:'right'},
         {key:'upload_cost_ph', label:'Upload $/h', align:'right'},
         {key:'download_cost_ph', label:'Download $/h', align:'right'},
+        {key:'score', label:'Score', align:'right'},
         {key:'id', label:'ID'},
         {key:'updated_at', label:'Updated'},
         {key:'url', label:'URL'}, // Optional plain URL text
     ];
 
-    const BASIC=['source','location','name','num_gpus','vram_gb','ram_gb','total_flops','flops_per_dollar_ph','total_cost_ph','reliability','upload_gbps','download_gbps'];
+    const BASIC=['source','location','name','num_gpus','vram_gb','ram_gb','total_flops','flops_per_dollar_ph','total_cost_ph','reliability','upload_gbps','download_gbps', 'score'];
 
     // Build column picker
     const colsGrid=qs('#cols-grid');

@@ -51,7 +51,7 @@ steps:
         "--region","us-central1",
         "--allow-unauthenticated",
         "--update-secrets","SUPABASE_URL=SUPABASE_URL:latest,SUPABASE_ANON_KEY=SUPABASE_ANON_KEY:latest",
-        "--memory","256Mi","--cpu","0.5","--min-instances","0","--max-instances","3"
+        "--min-instances","0",
       ]
 
 

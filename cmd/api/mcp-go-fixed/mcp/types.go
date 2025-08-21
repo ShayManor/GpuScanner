@@ -8,8 +8,9 @@ import (
 	"maps"
 	"strconv"
 
-	"github.com/yosida95/uritemplate/v3"
 	"net/http"
+
+	"github.com/yosida95/uritemplate/v3"
 )
 
 type MCPMethod string

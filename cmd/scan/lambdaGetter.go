@@ -72,29 +72,27 @@ func lambdaGetter() ([]GPU, error) {
 	out := make([]GPU, 0, len(instanceTypes))
 
 	for typeName, instance := range instanceTypes {
-		// Extract GPU name from description (e.g., "8x NVIDIA A100 (40 GB)" -> "A100")
-		gpuName := extractGPUName(instance.Instance.GPUDescription)
-
 		// Convert price from cents to dollars per hour
 		pricePerHour := instance.Instance.PricePerHour / 100.0
 
 		// Extract VRAM from GPU description
 		vram := extractVRAM(instance.Instance.GPUDescription)
 		if len(instance.Region) > 0 {
-			flops, _ := gpuSpecs(typeName)
+			flops, membw, name := gpuSpecs(typeName)
 			flops = float64(instance.Instance.Specs.GPUs) * flops / 10e11
 			region := instance.Region[0].Name
-			out = append(out, GPU{
-				_Id:              typeName,
-				Location:         region,
-				Source:           "lambda",
-				Url:              getLambdaURL(),
-				Name:             gpuName,
-				Vram:             vram * 1024,
-				NumGPUs:          instance.Instance.Specs.GPUs,
-				Reliability:      0.99,
-				TotalFlops:       flops,
-				FlopsPerDollarPH: flops / pricePerHour,
+			newGpu := GPU{
+				_Id:               typeName,
+				Location:          region,
+				Source:            "lambda",
+				Url:               getLambdaURL(),
+				Name:              name,
+				Vram:              vram * 1024,
+				GpuMemoryBandwith: membw,
+				NumGPUs:           instance.Instance.Specs.GPUs,
+				Reliability:       0.99,
+				TotalFlops:        flops,
+				FlopsPerDollarPH:  flops / pricePerHour,
 
 				UploadSpeed:   10000,
 				DownloadSpeed: 10000,
@@ -109,26 +107,16 @@ func lambdaGetter() ([]GPU, error) {
 
 				TotalCostPH: pricePerHour,
 				GpuCostPH:   pricePerHour,
-			})
+			}
+			newGpu.Score = calculateScore(newGpu)
+			newGpu.ScoreDPH = newGpu.Score / newGpu.TotalCostPH
+			out = append(out, newGpu)
 		}
 
 	}
 
 	fmt.Printf("Found %d Lambda Labs GPUs\n", len(out))
 	return out, nil
-}
-
-// Helper function to extract GPU name from description
-func extractGPUName(description string) string {
-	// Pattern: "8x NVIDIA A100 (40 GB)" -> "A100"
-	parts := strings.Fields(description)
-	for i, part := range parts {
-		if strings.Contains(strings.ToUpper(part), "NVIDIA") && i+1 < len(parts) {
-			return parts[i+1]
-		}
-	}
-	// Fallback: return the whole description
-	return description
 }
 
 // Helper function to extract VRAM from description

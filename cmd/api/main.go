@@ -5,13 +5,26 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/mark3labs/mcp-go/server"
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	_ "github.com/shaymanor/GpuScanner/docs"
 )
+
+func sseMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-cache")
+		w.Header().Set("Connection", "keep-alive")
+		w.Header().Set("X-Accel-Buffering", "no") // Disable nginx buffering
+		next.ServeHTTP(w, r)
+	})
+}
 
 // @title           GPU Catalog API
 // @version         1.0
@@ -24,7 +37,7 @@ func main() {
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		ExposedHeaders:   []string{"Content-Length"},
 		AllowCredentials: false,
@@ -50,14 +63,75 @@ func main() {
 	})
 	r.Get("/docs/*", httpSwagger.WrapHandler)
 
+	// MCP
+	mcpSrv := server.NewMCPServer(
+		"GPUFinder-MCP", "0.1.0",
+		server.WithToolCapabilities(true),
+		server.WithLogging(),
+		server.WithRecovery(),
+	)
+
+	// search_gpus
+	mcpSrv.AddTool(
+		mcp.NewTool("search_gpus",
+			mcp.WithDescription("Search gpufindr catalogue by name/region/price"),
+			mcp.WithString("query", mcp.Description("substring to match in GPU name. * for any.")),
+			mcp.WithString("region", mcp.Description("exact region code, e.g. us-south-1, * for any")),
+			mcp.WithNumber("max_price", mcp.Description("max USD per-hour price. -1 for any.")),
+			mcp.WithNumber("min_score", mcp.Description("Min score for performance/efficiency. 0 for any.")),
+			mcp.WithString("order_by", mcp.Description("Column to order by (Ex: score.desc, gpu_cost_ph.asc)")),
+			mcp.WithNumber("limit", mcp.Description("max rows to return (default 50, max 200)")),
+			mcp.WithNumber("offset", mcp.Description("starting row (default 0)")),
+		),
+		searchHandler,
+	)
+
+	// fetch_gpu
+	mcpSrv.AddTool(
+		mcp.NewTool("fetch_gpu",
+			mcp.WithDescription("Fetch a single GPU offer by id"),
+			mcp.WithString("id", mcp.Required(), mcp.Description("ID returned from search")),
+		),
+		fetchHandler,
+	)
+
+	sse := server.NewSSEServer(
+		mcpSrv,
+		server.WithStaticBasePath("/mcp"),
+		server.WithSSEEndpoint("/sse"),
+		server.WithMessageEndpoint("/message"),
+		server.WithBaseURL("https://gpufindr.com"),
+		server.WithUseFullURLForMessageEndpoint(true), // some clients require absolute
+		server.WithKeepAliveInterval(30*time.Second),
+	)
+
+	r.Handle("/mcp/sse", sseMiddleware(sse.SSEHandler()))
+	r.Handle("/mcp/message", sse.MessageHandler())
+
 	log.Println("Setting up SPA handler...")
 
 	h, err := spaHandler()
 	if err != nil {
 		log.Printf("Failed to create SPA handler: %v", err)
 	} else {
-		r.Mount("/", h)
+		// GET-only + path guard so /mcp/* never falls through to the SPA
+		spa := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.Method != http.MethodGet && req.Method != http.MethodHead {
+				http.NotFound(w, req)
+				return
+			}
+			if strings.HasPrefix(req.URL.Path, "/mcp/") ||
+				strings.HasPrefix(req.URL.Path, "/gpus") ||
+				strings.HasPrefix(req.URL.Path, "/docs/") {
+				http.NotFound(w, req)
+				return
+			}
+			h.ServeHTTP(w, req)
+		})
+		r.Handle("/*", spa) // mount SPA LAST
+		r.Handle("/", spa)
 	}
+
 	port := "8080"
 	if os.Getenv("PORT") != "" {
 		port = os.Getenv("PORT")

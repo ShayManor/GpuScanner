@@ -200,7 +200,7 @@ func vastGetter() ([]GPU, error) {
 				o.Location = o.Location[2:]
 			}
 
-			out = append(out, GPU{
+			newGpu := GPU{
 				_Id:               strconv.Itoa(o.ID) + "v",
 				Location:          o.Location,
 				Reliability:       o.Reliability,
@@ -233,7 +233,10 @@ func vastGetter() ([]GPU, error) {
 				UploadCostPH:     o.UploadCost,
 				DownloadCostPH:   o.DownloadCost,
 				FlopsPerDollarPH: o.FlopsPerDollarPH,
-			})
+			}
+			newGpu.Score = calculateScore(newGpu)
+			newGpu.ScoreDPH = newGpu.Score / newGpu.TotalCostPH
+			out = append(out, newGpu)
 		}
 	}
 	fmt.Println("Found", len(out), "Vast GPUs")
