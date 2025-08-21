@@ -13,7 +13,22 @@
         .card{background:var(--elev);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:0 8px 18px rgba(0,0,0,.35)}
         .grid{display:grid;grid-template-columns:1fr;gap:12px}
         .logo{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#60a5fa);box-shadow:0 10px 24px rgba(59,130,246,.3);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px}
-        .controls{display:grid;grid-template-columns:repeat(12,1fr);gap:10px;align-items:end}
+
+        .main-search{margin-bottom:20px}
+        .main-search .f{display:flex;flex-direction:column;gap:8px}
+        .main-search label{color:var(--muted);font-size:14px;font-weight:600}
+        .main-search input{width:100%;background:#0f1218;border:1px solid var(--border);color:var(--text);padding:16px 20px;border-radius:12px;font-size:18px;font-weight:500}
+        .main-search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+
+        .advanced-section{margin-bottom:16px}
+        .advanced-section summary{padding:12px 16px;background:#0f1218;border:1px solid var(--border);border-radius:10px;cursor:pointer;font-weight:600;color:var(--text);list-style:none;display:flex;align-items:center;justify-content:space-between}
+        .advanced-section summary::-webkit-details-marker{display:none}
+        .advanced-section summary::after{content:'▼';font-size:12px;transition:transform 0.2s}
+        .advanced-section[open] summary::after{transform:rotate(180deg)}
+        .advanced-section summary:hover{background:#131722}
+
+        .advanced-controls{display:grid;grid-template-columns:repeat(12,1fr);gap:10px;align-items:end;padding:16px;background:#0a0b0e;border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px}
+
         .f{display:flex;flex-direction:column;gap:6px} label{color:var(--muted);font-size:12px}
         input[type=text],input[type=number],select{width:100%;background:#0f1218;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px}
         .btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
@@ -21,14 +36,17 @@
         .info-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px} .muted{color:var(--muted)}
         table{width:100%;border-collapse:separate;border-spacing:0;margin-top:12px}
         thead th{position:sticky;top:0;background:#0f1218;color:var(--muted);font-weight:600;text-align:left;padding:10px;border-bottom:1px solid var(--border);z-index:1}
-        tbody td{padding:10px;border-bottom:1px solid #131824;background:var(--row)} tbody tr:hover td{background:#131722}
+        tbody td{padding:10px;border-bottom:1px solid #131824;background:var(--row)}
+        tbody tr:hover td{background:#131722}
+        tbody tr[data-url]{cursor:pointer}
+        tbody tr[data-url]:hover td{background:#151a28}
         .right{text-align:right}
         .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#0f1625;border:1px solid var(--border);font-size:12px}
         details.columns{margin-top:8px}
         .cols-grid{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:8px;margin-top:8px}
         .cols-actions{display:flex;gap:8px;margin-top:8px}
-        @media (max-width:980px){.controls{grid-template-columns:repeat(6,1fr)}.cols-grid{grid-template-columns:repeat(2,minmax(160px,1fr))}}
-        @media (max-width:640px){.controls{grid-template-columns:repeat(3,1fr)}}
+        @media (max-width:980px){.advanced-controls{grid-template-columns:repeat(6,1fr)}.cols-grid{grid-template-columns:repeat(2,minmax(160px,1fr))}}
+        @media (max-width:640px){.advanced-controls{grid-template-columns:repeat(3,1fr)}}
     </style>
 </head>
 <body>
@@ -40,38 +58,55 @@
 
     <section class="grid">
         <div class="card">
-            <form id="form" class="controls" autocomplete="off">
-                <div class="f" style="grid-column: span 3; min-width: 160px;">
-                    <label for="source">Provider <span class="muted">(exact)</span></label>
-                    <input id="source" name="source" type="text" list="dl-sources" placeholder="e.g., vastai" />
-                    <datalist id="dl-sources"></datalist>
+            <form id="form" autocomplete="off">
+                <!-- Main Search Bar -->
+                <div class="main-search">
+                    <div class="f">
+                        <label for="name">Search GPUs</label>
+                        <input id="name" name="name" type="text" list="dl-names" placeholder="Search by GPU name (e.g., RTX 4090, A100 SXM)" />
+                        <datalist id="dl-names"></datalist>
+                    </div>
                 </div>
-                <div class="f" style="grid-column: span 3; min-width: 160px;">
-                    <label for="location">Location <span class="muted">(substring)</span></label>
-                    <input id="location" name="location" type="text" list="dl-locations" placeholder="e.g., us-west" />
-                    <datalist id="dl-locations"></datalist>
-                </div>
-                <div class="f" style="grid-column: span 2; min-width: 120px;">
-                    <label for="max_price">Max price ($/h)</label>
-                    <input id="max_price" name="max_price" type="number" min="0" step="0.01" />
-                </div>
-                <div class="f" style="grid-column: span 2; min-width: 120px;">
-                    <label for="min_flopsd">Min FLOPs per $/h</label>
-                    <input id="min_flopsd" name="min_flopsd" type="number" min="0" step="0.01" />
-                </div>
-                <div class="f" style="grid-column: span 2; min-width: 160px;">
-                    <label for="sort_col">Sort column</label>
-                    <select id="sort_col" name="sort_col"></select>
-                </div>
-                <div class="f" style="grid-column: span 1; min-width: 100px;">
-                    <label for="sort_dir">Dir</label>
-                    <select id="sort_dir" name="sort_dir"><option value="desc">desc</option><option value="asc">asc</option></select>
-                </div>
-                <div class="f" style="grid-column: span 2; min-width: 120px;">
-                    <label for="limit">Limit</label>
-                    <select id="limit" name="limit"><option>50</option><option selected>200</option><option>500</option><option>1000</option></select>
-                </div>
-                <div class="f" style="grid-column: span 12; display:flex; gap:10px; margin-top: 6px;">
+
+                <!-- Advanced Options -->
+                <details class="advanced-section" id="advancedOptions">
+                    <summary>Advanced Filters</summary>
+                    <div class="advanced-controls">
+                        <div class="f" style="grid-column: span 3; min-width: 160px;">
+                            <label for="source">Provider <span class="muted">(exact)</span></label>
+                            <input id="source" name="source" type="text" list="dl-sources" placeholder="e.g., vastai" />
+                            <datalist id="dl-sources"></datalist>
+                        </div>
+                        <div class="f" style="grid-column: span 3; min-width: 160px;">
+                            <label for="location">Location <span class="muted">(substring)</span></label>
+                            <input id="location" name="location" type="text" list="dl-locations" placeholder="e.g., us-west" />
+                            <datalist id="dl-locations"></datalist>
+                        </div>
+                        <div class="f" style="grid-column: span 2; min-width: 120px;">
+                            <label for="max_price">Max price ($/h)</label>
+                            <input id="max_price" name="max_price" type="number" min="0" step="0.01" />
+                        </div>
+                        <div class="f" style="grid-column: span 2; min-width: 120px;">
+                            <label for="min_flopsd">Min FLOPs per $/h</label>
+                            <input id="min_flopsd" name="min_flopsd" type="number" min="0" step="0.01" />
+                        </div>
+                        <div class="f" style="grid-column: span 2; min-width: 160px;">
+                            <label for="sort_col">Sort column</label>
+                            <select id="sort_col" name="sort_col"></select>
+                        </div>
+                        <div class="f" style="grid-column: span 1; min-width: 100px;">
+                            <label for="sort_dir">Dir</label>
+                            <select id="sort_dir" name="sort_dir"><option value="desc">desc</option><option value="asc">asc</option></select>
+                        </div>
+                        <div class="f" style="grid-column: span 2; min-width: 120px;">
+                            <label for="limit">Limit</label>
+                            <select id="limit" name="limit"><option>50</option><option selected>200</option><option>500</option><option>1000</option></select>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Search Actions -->
+                <div style="display:flex; gap:10px; margin-top: 16px;">
                     <button class="btn" type="submit" id="btn-search">Search</button>
                     <button class="btn ghost" type="button" id="btn-reset">Reset</button>
                 </div>
@@ -107,7 +142,7 @@
     const API='https://gpufindr.com/gpus';
     const form=qs('#form'); const statusEl=qs('#status'); const rowsEl=qs('#rows'); const theadRow=qs('#thead-row');
     const prevBtn=qs('#prevBtn'); const nextBtn=qs('#nextBtn'); const pageInfo=qs('#pageInfo');
-    const dlSources=qs('#dl-sources'); const dlLocations=qs('#dl-locations');
+    const dlSources=qs('#dl-sources'); const dlLocations=qs('#dl-locations'); const dlNames=qs('#dl-names');
     const sortColSel=qs('#sort_col'); const sortDirSel=qs('#sort_dir');
 
     // Column definitions (include all model fields + derived)
@@ -137,12 +172,13 @@
         {key:'upload_cost_ph', label:'Upload $/h', align:'right'},
         {key:'download_cost_ph', label:'Download $/h', align:'right'},
         {key:'score', label:'Score', align:'right'},
+        {key:'score_dollar_ph', label:'Score/$·h', align:'right'},
         {key:'id', label:'ID'},
         {key:'updated_at', label:'Updated'},
         {key:'url', label:'URL'}, // Optional plain URL text
     ];
 
-    const BASIC=['source','location','name','num_gpus','vram_gb','ram_gb','total_flops','flops_per_dollar_ph','total_cost_ph','reliability','upload_gbps','download_gbps', 'score'];
+    const BASIC=['source','location','name','num_gpus','vram_gb','ram_gb','total_flops','flops_per_dollar_ph','total_cost_ph','reliability','upload_gbps','download_gbps', 'score', 'score_dollar_ph'];
 
     // Build column picker
     const colsGrid=qs('#cols-grid');
@@ -181,11 +217,11 @@
 
     // Default sort
     const qsSort=getQS('sort');
-    sortColSel.value = (qsSort?qsSort.split('.')[0]:'total_cost_ph');
+    sortColSel.value = (qsSort?qsSort.split('.')[0]:'score');
     sortDirSel.value = (qsSort?qsSort.split('.')[1]:'desc');
 
     // Initialize form from URL
-    ['source','location','max_price','min_flopsd','limit'].forEach(f=>{ const v=getQS(f); if(v!=null) qs('#'+f).value=v; });
+    ['source','location','name','max_price','min_flopsd','limit'].forEach(f=>{ const v=getQS(f); if(v!=null) qs('#'+f).value=v; });
     let offset = parseInt(getQS('offset')||'0',10)||0;
 
     // Prime datalists
@@ -196,6 +232,12 @@
     qs('#btn-reset').addEventListener('click',()=>{ resetForm(); offset=0; doSearch(); });
     prevBtn.addEventListener('click',()=>{ if(offset>0){ offset=Math.max(0, offset-getLimit()); doSearch(); }});
     nextBtn.addEventListener('click',()=>{ offset+=getLimit(); doSearch(); });
+
+    // Auto-search on main search input
+    qs('#name').addEventListener('input', debounce(() => {
+        offset = 0;
+        doSearch();
+    }, 300));
 
     // Initial render
     renderHeaders();
@@ -214,11 +256,13 @@
     let inflight;
 
     async function primeDatalists(){
-        const url=new URL(API); url.searchParams.set('limit','200'); const r=await fetch(url); const rows=await r.json();
+        const url=new URL(API); url.searchParams.set('limit','500'); const r=await fetch(url); const rows=await r.json();
         const sources=[...new Set(rows.map(x=>x.source).filter(Boolean))].sort();
         const locs=[...new Set(rows.map(x=>x.location).filter(Boolean))].sort();
+        const names=[...new Set(rows.map(x=>x.name).filter(Boolean))].sort();
         dlSources.innerHTML=sources.map(s=>`<option value="${escapeHtml(s)}"></option>`).join('');
         dlLocations.innerHTML=locs.map(s=>`<option value="${escapeHtml(s)}"></option>`).join('');
+        dlNames.innerHTML=names.map(s=>`<option value="${escapeHtml(s)}"></option>`).join('');
     }
 
     function getLimit(){ return parseInt(qs('#limit').value,10); }
@@ -229,12 +273,14 @@
         const params=new URLSearchParams();
         const source=qs('#source').value.trim();
         const location=qs('#location').value.trim();
+        const name=qs('#name').value.trim();
         const max_price=qs('#max_price').value.trim();
         const min_flopsd=qs('#min_flopsd').value.trim();
         const sort=currentSort();
         const limit=getLimit();
         if(source) params.set('source',source);
         if(location) params.set('location',location);
+        if(name) params.set('name',name);
         if(max_price) params.set('max_price',max_price);
         if(min_flopsd) params.set('min_flopsd',min_flopsd);
         if(sort) params.set('sort',sort);
@@ -278,8 +324,21 @@
     function renderRows(rows){
         const cols=[...selectedCols];
         rowsEl.innerHTML = rows.map(r=>{
-            return `<tr>${cols.map(k=>`<td${COLS.find(c=>c.key===k)?.align==='right'?' class=\"right\"':''}>${renderCell(k,r)}</td>`).join('')}</tr>`;
+            const urlAttr = r.url ? ` data-url="${escapeAttr(r.url)}"` : '';
+            return `<tr${urlAttr}>${cols.map(k=>`<td${COLS.find(c=>c.key===k)?.align==='right'?' class=\"right\"':''}>${renderCell(k,r)}</td>`).join('')}</tr>`;
         }).join('') || `<tr><td colspan="${cols.length}" class="muted">No results.</td></tr>`;
+
+        // Add click handlers to rows with URLs
+        rowsEl.querySelectorAll('tr[data-url]').forEach(tr => {
+            tr.addEventListener('click', (e) => {
+                // Don't navigate if clicking on a link
+                if (e.target.tagName === 'A') return;
+                const url = tr.dataset.url;
+                if (url) {
+                    window.open(url, '_blank', 'noopener');
+                }
+            });
+        });
     }
 
     function renderCell(key,r){
@@ -303,6 +362,7 @@
             case 'disk_bw_gbps': return fmtNum(r.disk_bw_gbps);
             case 'gpu_mem_bw_gbps': return fmtNum(r.gpu_mem_bw_gbps);
             case 'flops_per_dollar_ph': return fmtNum(r.flops_per_dollar_ph);
+            case 'score_dollar_ph': return fmtNum(r.score_dollar_ph);
             case 'total_flops': return fmtNum(r.total_flops);
             case 'updated_at': return escapeHtml(r.updated_at||'—');
             case 'url': return r.url ? `<a href="${escapeAttr(r.url)}" target="_blank" rel="noopener">${escapeHtml(r.url)}</a>` : '—';
@@ -322,8 +382,24 @@
     function locationPath(){ return location.pathname.split('/').pop(); }
     function qs(sel){ return document.querySelector(sel); }
     function getQS(key){ const u=new URL(location.href); return u.searchParams.get(key); }
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
 
-    async function resetForm(){ ['source','location','max_price','min_flopsd'].forEach(id=>qs('#'+id).value=''); sortColSel.value='total_cost_ph'; sortDirSel.value='desc'; }
+    async function resetForm(){
+        ['source','location','name','max_price','min_flopsd'].forEach(id=>qs('#'+id).value='');
+        sortColSel.value='score';
+        sortDirSel.value='desc';
+        qs('#advancedOptions').removeAttribute('open');
+    }
 
 </script>
 </body>

@@ -21,6 +21,7 @@ type GPU struct {
 	Duration    float64 `json:"duration_hours" bson:"duration_hours"`
 	Source      string  `json:"source" bson:"source"` // e.g., "tensordock", "vast", etc.
 	Score       float64 `json:"score" bson:"score"`
+	ScoreDPH    float64 `json:"score_dollar_ph" bson:"score_dollar_ph"`
 	// GPU details
 	Name              string  `json:"name" bson:"name"`
 	Vram              int     `json:"vram_mb" bson:"vram_mb"`

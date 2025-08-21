@@ -107,6 +107,9 @@ func convertGPUNameToURLFormat(gpuName string) string {
 			// Guard against L40S-style workstation naming: we only do this for RTX + digits
 			parts[1] = name[:len(name)-1]
 			parts = append(parts, "s") // will map to "Super" below
+		case strings.HasSuffix(name, "ws"):
+			parts[1] = name[:len(name)-2]
+			parts = append(parts, "ws")
 		}
 	}
 
@@ -136,6 +139,8 @@ func convertGPUNameToURLFormat(gpuName string) string {
 				result += "Laptop"
 			case "d":
 				result += "D"
+			case "ws":
+				result += "BlackwellWorkstation"
 			default:
 				// Capitalize first letter
 				result += strings.Title(part)
