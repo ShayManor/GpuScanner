@@ -55,6 +55,7 @@ func main() {
 
 	r.Get("/gpus", getHandler)
 	r.Get("/gpus/count", countHandler)
+	r.Get("/blog", blogHandler)
 
 	// Swagger UI at /docs
 	r.Route("/docs", func(r chi.Router) {
