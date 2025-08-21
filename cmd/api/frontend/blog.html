@@ -3,8 +3,27 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Blog - GPU Finder</title>
-    <meta name="description" content="Latest news, insights, and updates from GPU Finder. Stay informed about GPU cloud hosting trends and market analysis." />
+    <title>Blog - GPU Finder | Latest GPU Cloud Hosting News & Insights</title>
+    <meta name="description" content="Stay updated with the latest GPU cloud hosting trends, market analysis, pricing insights, and industry news from GPU Finder. Expert commentary on AI/ML infrastructure." />
+    <meta name="keywords" content="GPU cloud hosting, GPU rental, cloud computing, AI infrastructure, machine learning, GPU prices, market analysis" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="GPU Finder" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://gpufindr.com/blog" />
+    <meta property="og:title" content="GPU Finder Blog - Latest GPU Cloud Hosting Insights" />
+    <meta property="og:description" content="Expert analysis on GPU cloud hosting trends, pricing, and market insights for AI/ML workloads." />
+    <meta property="og:site_name" content="GPU Finder" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary" />
+    <meta property="twitter:url" content="https://gpufindr.com/blog" />
+    <meta property="twitter:title" content="GPU Finder Blog - Latest GPU Cloud Hosting Insights" />
+    <meta property="twitter:description" content="Expert analysis on GPU cloud hosting trends, pricing, and market insights for AI/ML workloads." />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://gpufindr.com/blog" />
     <style>
         :root {
             --bg: #0b0c0f;
@@ -52,16 +71,14 @@
         nav a:hover { background: var(--elev-2); }
 
         /* Page Header */
-        .page-header { text-align: center; margin-bottom: 60px; }
+        .page-header { text-align: center; margin-bottom: 40px; }
         .page-title {
-            font-size: 48px; font-weight: 800; margin: 0 0 16px;
-            background: linear-gradient(135deg, var(--text), var(--muted));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 32px; font-weight: 700; margin: 0 0 12px;
+            color: var(--text);
         }
         .page-subtitle {
-            font-size: 20px; color: var(--muted); margin: 0;
-            max-width: 600px; margin-left: auto; margin-right: auto;
+            font-size: 16px; color: var(--muted); margin: 0;
+            max-width: 500px; margin-left: auto; margin-right: auto;
         }
 
         /* Loading State */
@@ -164,14 +181,14 @@
 
         /* Empty State */
         .empty-state {
-            text-align: center; padding: 60px 20px;
+            text-align: center; padding: 40px 20px;
             color: var(--muted);
         }
         .empty-icon {
-            font-size: 48px; margin-bottom: 16px;
+            font-size: 40px; margin-bottom: 16px;
         }
         .empty-title {
-            font-size: 24px; font-weight: 600;
+            font-size: 20px; font-weight: 600;
             margin: 0 0 12px; color: var(--text);
         }
         .empty-message {
@@ -196,7 +213,7 @@
 
         /* Footer */
         footer {
-            border-top: 1px solid #1f2430; padding-top: 40px; margin-top: 80px;
+            border-top: 1px solid #1f2430; padding-top: 40px; margin-top: 60px;
             text-align: center; color: var(--muted);
         }
         .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 20px; }
@@ -206,8 +223,8 @@
         /* Responsive */
         @media (max-width: 768px) {
             .wrap { padding: 24px 16px; }
-            .page-title { font-size: 36px; }
-            .page-subtitle { font-size: 18px; }
+            .page-title { font-size: 28px; }
+            .page-subtitle { font-size: 15px; }
             .post-title { font-size: 24px; }
             .blog-post { padding: 24px; }
             .footer-links { flex-direction: column; gap: 12px; }
@@ -238,7 +255,7 @@
 
     <section class="page-header">
         <h1 class="page-title">Blog</h1>
-        <p class="page-subtitle">Latest insights, market analysis, and updates from the GPU cloud hosting world.</p>
+        <p class="page-subtitle">GPU cloud hosting insights, market analysis, and industry updates.</p>
     </section>
 
     <main class="blog-container" id="blog-container">
@@ -325,18 +342,21 @@
     function createBlogPost(post, index) {
         const formattedContent = parseMarkdown(post.data || '');
         const postDate = formatDate(post.date);
+        const isoDate = post.date ? new Date(post.date).toISOString() : new Date().toISOString();
 
         return `
-            <article class="blog-post">
+            <article class="blog-post" itemscope itemtype="https://schema.org/BlogPosting">
                 <header class="post-header">
-                    <h2 class="post-title">${post.title || 'Untitled Post'}</h2>
+                    <h2 class="post-title" itemprop="headline">${post.title || 'Untitled Post'}</h2>
                     <div class="post-meta">
-                        <span class="post-date">${postDate}</span>
+                        <time class="post-date" datetime="${isoDate}" itemprop="datePublished">${postDate}</time>
                     </div>
                 </header>
-                <div class="post-content">
+                <div class="post-content" itemprop="articleBody">
                     ${formattedContent}
                 </div>
+                <meta itemprop="author" content="GPU Finder" />
+                <meta itemprop="publisher" content="GPU Finder" />
             </article>
         `;
     }
@@ -406,6 +426,26 @@
 
     // Initialize blog when page loads
     document.addEventListener('DOMContentLoaded', loadBlogPosts);
+</script>
+
+<!-- JSON-LD Structured Data for SEO -->
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": "GPU Finder Blog",
+        "description": "Expert insights and analysis on GPU cloud hosting, pricing trends, and AI/ML infrastructure market developments.",
+        "url": "https://gpufindr.com/blog",
+        "publisher": {
+            "@type": "Organization",
+            "name": "GPU Finder",
+            "url": "https://gpufindr.com"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://gpufindr.com/blog"
+        }
+    }
 </script>
 </body>
 </html>
