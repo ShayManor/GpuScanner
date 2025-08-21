@@ -11,8 +11,9 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
-func fetchCatalogue() ([]GPU, error) {
-	resp, err := http.Get("https://gpufindr.com/gpus")
+func fetchCatalogue(order string) ([]GPU, error) {
+	url := fmt.Sprintf("https://gpufindr.com/gpus?sort=%s", order)
+	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
@@ -29,6 +30,8 @@ func searchHandler(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolR
 	q := strings.ToLower(req.GetString("query", ""))
 	region := req.GetString("region", "*")
 	maxP := req.GetFloat("max_price", 0)
+	minS := req.GetFloat("min_score", 0)
+	order := req.GetString("order_by", "updated_at.desc")
 	limit := req.GetInt("limit", 50)
 	if limit <= 0 {
 		limit = 50
@@ -41,7 +44,7 @@ func searchHandler(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolR
 		offset = 0
 	}
 
-	gpus, err := fetchCatalogue()
+	gpus, err := fetchCatalogue(order)
 	if err != nil {
 		return mcp.NewToolResultErrorFromErr("failed to reach gpufindr", err), nil
 	}
@@ -49,6 +52,9 @@ func searchHandler(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolR
 	var hits []GPU
 	for _, g := range gpus {
 		if q != "" && q != "*" && !strings.Contains(strings.ToLower(g.Name), q) {
+			continue
+		}
+		if g.Score < minS {
 			continue
 		}
 		if region != "*" && region != g.Location {
@@ -100,7 +106,7 @@ func fetchHandler(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolRe
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
-	gpus, err := fetchCatalogue()
+	gpus, err := fetchCatalogue("updated_at.desc")
 	if err != nil {
 		return mcp.NewToolResultErrorFromErr("failed to reach gpufindr", err), nil
 	}

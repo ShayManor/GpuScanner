@@ -78,6 +78,8 @@ func main() {
 			mcp.WithString("query", mcp.Description("substring to match in GPU name. * for any.")),
 			mcp.WithString("region", mcp.Description("exact region code, e.g. us-south-1, * for any")),
 			mcp.WithNumber("max_price", mcp.Description("max USD per-hour price. -1 for any.")),
+			mcp.WithNumber("min_score", mcp.Description("Min score for performance/efficiency. 0 for any.")),
+			mcp.WithString("order_by", mcp.Description("Column to order by (Ex: score.desc, gpu_cost_ph.asc)")),
 			mcp.WithNumber("limit", mcp.Description("max rows to return (default 50, max 200)")),
 			mcp.WithNumber("offset", mcp.Description("starting row (default 0)")),
 		),

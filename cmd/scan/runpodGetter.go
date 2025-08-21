@@ -183,7 +183,7 @@ query {
 		}
 
 		// Get FLOPS and bandwidth using enhanced lookup
-		totalFlops, memBW := gpuSpecs(t.DisplayName)
+		totalFlops, memBW, name := gpuSpecs(t.DisplayName)
 
 		// Create configurations for different GPU counts
 		gpuCounts := []int{1}
@@ -236,7 +236,7 @@ query {
 				Duration:    0, // not exposed
 
 				Source:            "runpod",
-				Name:              t.DisplayName,
+				Name:              name,
 				Vram:              vramMB,
 				TotalFlops:        totalSystemFlops,
 				GpuMemoryBandwith: memBW,
@@ -264,6 +264,8 @@ query {
 				FlopsPerDollarPH: flopsPerDollar,
 			}
 			newGpu.Url = getRunPodURL(newGpu)
+			newGpu.Score = calculateScore(newGpu)
+			newGpu.ScoreDPH = newGpu.Score / newGpu.TotalCostPH
 			out = append(out, newGpu)
 		}
 	}

@@ -122,7 +122,7 @@ func tensordockGetter() ([]GPU, error) {
 			if g.AvailableCount <= 0 || hn.UptimePercentage <= 0.0 {
 				continue
 			}
-			totalFlops, memBWGBs := gpuSpecs(g.V0Name)
+			totalFlops, memBWGBs, name := gpuSpecs(g.V0Name)
 			totalFlops = totalFlops / 1e12
 			newGpu := GPU{
 				_Id:         hn.ID,
@@ -130,7 +130,7 @@ func tensordockGetter() ([]GPU, error) {
 				Reliability: hn.UptimePercentage / 100.0, // docs give percent
 				Duration:    0,                           // not exposed
 
-				Name:              g.V0Name,
+				Name:              name,
 				Vram:              parseVRAMMB(g.V0Name),
 				TotalFlops:        totalFlops, // not exposed
 				GpuMemoryBandwith: memBWGBs,   // not exposed
@@ -161,6 +161,8 @@ func tensordockGetter() ([]GPU, error) {
 				Source:           "tensordock",
 			}
 			newGpu.Url = getTensorDockURL(newGpu)
+			newGpu.Score = calculateScore(newGpu)
+			newGpu.ScoreDPH = newGpu.Score / newGpu.TotalCostPH
 			out = append(out, newGpu)
 
 		}
