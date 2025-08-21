@@ -157,9 +157,9 @@ func gpuSpecs(displayName string) (flops float64, memBWGBs float64, name string)
 		gb40 := has("40gb", "40g", " 40 ")
 		switch {
 		case sxm && gb80:
-			return 19.5e12, 2039, "A100 SXM"
+			return 19.5e12, 2039, "A100 SXM4"
 		case sxm && gb40:
-			return 19.5e12, 1555, "A100 SXM"
+			return 19.5e12, 1555, "A100 SXM4"
 		case !sxm && gb80:
 			return 19.5e12, 1935, "A100 PCIE"
 		case !sxm && gb40:
