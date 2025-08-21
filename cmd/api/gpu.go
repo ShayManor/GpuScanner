@@ -81,6 +81,7 @@ func mustEnv(k string) string {
 // @Param       location    query  string  false  "Case-insensitive substring match"
 // @Param       max_price   query  number  false  "Max total_cost_ph"
 // @Param       min_flopsd  query  number  false  "Min flops_per_dollar_ph"
+// @Param       name        query  string  false  "Name of GPU (e.g. A100 SXM, RTX 4090)"
 // @Param       sort        query  string  false  "Column.direction (e.g., updated_at.desc)" default(updated_at.desc)
 // @Param       limit       query  int     false  "Limit (1-1000)"                           default(200) minimum(1) maximum(1000)
 // @Param       offset      query  int     false  "Offset for pagination"                     minimum(0)
@@ -95,6 +96,9 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 
 	if s := q.Get("source"); s != "" {
 		v.Set("source", "eq."+s)
+	}
+	if name := q.Get("name"); name != "" {
+		v.Set("name", "eq."+name)
 	}
 	if loc := q.Get("location"); loc != "" {
 		v.Set("location", "ilike.*"+loc+"*")

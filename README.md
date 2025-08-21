@@ -3,8 +3,7 @@ Scans different platforms and finds cheapest GPUs.
 
 Searches through given APIs and compiles important data into **ONE** easy-to-read site.
 
-TODO: Create a score for each node
-TODO: Add a column for a standard name for the gpu
-TODO: In location dropdown, put the count
-TODO: Order score by price and put hot categories in frontend
+TODO: Add more options to api
+TODO: Add search to frontend (search for name)
+TODO: Put hot gpus in the front page - easy to click.
 TODO: Blog
