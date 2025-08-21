@@ -87,7 +87,7 @@
                             <input id="max_price" name="max_price" type="number" min="0" step="0.01" />
                         </div>
                         <div class="f" style="grid-column: span 2; min-width: 120px;">
-                            <label for="min_flopsd">Min FLOPs per $/h</label>
+                            <label for="min_flopsd">Min TFLOPs per $/h</label>
                             <input id="min_flopsd" name="min_flopsd" type="number" min="0" step="0.01" />
                         </div>
                         <div class="f" style="grid-column: span 2; min-width: 160px;">
@@ -153,8 +153,8 @@
         {key:'num_gpus', label:'#GPUs', align:'right'},
         {key:'vram_gb', label:'VRAM (GB)', align:'right', sortKey:'vram_mb'},
         {key:'ram_gb', label:'RAM (GB)', align:'right', sortKey:'ram_mb'},
-        {key:'total_flops', label:'Total FLOPs', align:'right'},
-        {key:'flops_per_dollar_ph', label:'FLOPs/$·h', align:'right'},
+        {key:'total_flops', label:'Total TFLOPs', align:'right'},
+        {key:'flops_per_dollar_ph', label:'TFLOPs/$·h', align:'right'},
         {key:'total_cost_ph', label:'$ / h', align:'right'},
         {key:'reliability', label:'Reliability %', align:'right'},
         {key:'gpu_mem_bw_gbps', label:'GPU Mem BW (GB/s)', align:'right'},
@@ -171,14 +171,14 @@
         {key:'disk_cost_ph', label:'Disk $/h', align:'right'},
         {key:'upload_cost_ph', label:'Upload $/h', align:'right'},
         {key:'download_cost_ph', label:'Download $/h', align:'right'},
-        {key:'score', label:'Score', align:'right'},
         {key:'score_dollar_ph', label:'Score/$·h', align:'right'},
+        {key:'score', label:'Score', align:'right'},
         {key:'id', label:'ID'},
         {key:'updated_at', label:'Updated'},
         {key:'url', label:'URL'}, // Optional plain URL text
     ];
 
-    const BASIC=['source','location','name','num_gpus','vram_gb','ram_gb','total_flops','flops_per_dollar_ph','total_cost_ph','reliability','upload_gbps','download_gbps', 'score', 'score_dollar_ph'];
+    const BASIC=['source','location','name','num_gpus','vram_gb','ram_gb','cpu_cores', 'total_flops','flops_per_dollar_ph','total_cost_ph','reliability', 'score_dollar_ph', 'score'];
 
     // Build column picker
     const colsGrid=qs('#cols-grid');
@@ -347,6 +347,8 @@
             case 'name': return r.url ? `<a href="${escapeAttr(r.url)}" target="_blank" rel="noopener">${escapeHtml(r.name||'—')}</a>` : escapeHtml(r.name||'—');
             case 'vram_gb': return fmtGB(r.vram_mb);
             case 'ram_gb': return fmtGB(r.ram_mb);
+            case 'score': return toPrecision(r.score)
+            case 'score_dollar_ph': return toPrecision(r.score_dollar_ph)
             case 'reliability': return isFiniteNum(r.reliability)? (r.reliability*100).toFixed(0)+'%':'—';
             case 'upload_gbps': return fmtGbps(r.upload_mbps);
             case 'download_gbps': return fmtGbps(r.download_mbps);
@@ -362,7 +364,6 @@
             case 'disk_bw_gbps': return fmtNum(r.disk_bw_gbps);
             case 'gpu_mem_bw_gbps': return fmtNum(r.gpu_mem_bw_gbps);
             case 'flops_per_dollar_ph': return fmtNum(r.flops_per_dollar_ph);
-            case 'score_dollar_ph': return fmtNum(r.score_dollar_ph);
             case 'total_flops': return fmtNum(r.total_flops);
             case 'updated_at': return escapeHtml(r.updated_at||'—');
             case 'url': return r.url ? `<a href="${escapeAttr(r.url)}" target="_blank" rel="noopener">${escapeHtml(r.url)}</a>` : '—';
@@ -374,7 +375,8 @@
     function fmtNum(x){ const n=Number(x); return Number.isFinite(n)? n.toLocaleString(undefined,{maximumFractionDigits:3}) : '—'; }
     function fmtInt(x){ const n=Number(x); return Number.isFinite(n)? n.toLocaleString() : '—'; }
     function fmtMoney(x){ const n=Number(x); return Number.isFinite(n)? ('$'+n.toFixed(2)) : '—'; }
-    function fmtGB(mb){ const n=Number(mb); return Number.isFinite(n)? (n/1024).toFixed(1)+' GB':'—'; }
+    function fmtGB(mb){ const n=Number(mb); return Number.isFinite(n)? (n/1024).toFixed(1):'—'; }
+    function toPrecision(x) {const n=Number(x); return Math.round(x * 100.0) / 100.0}
     function fmtGbps(mbps){ const n=Number(mbps); return Number.isFinite(n)? (n/1000).toFixed(2)+' Gbps':'—'; }
     function isFiniteNum(x){ const n=Number(x); return Number.isFinite(n); }
     function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c])); }
