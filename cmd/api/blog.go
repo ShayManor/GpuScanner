@@ -17,9 +17,9 @@ type data struct {
 // Gets all blog posts and returns them
 func blogHandler(w http.ResponseWriter, r *http.Request) {
 	base := os.Getenv("SUPABASE_URL")
-	key := os.Getenv("SUPABASE_SERVICE_KEY")
+	key := os.Getenv("SUPABASE_ANON_KEY")
 	if base == "" || key == "" {
-		http.Error(w, "server not configured: SUPABASE_URL/SUPABASE_SERVICE_KEY missing", http.StatusInternalServerError)
+		http.Error(w, "server not configured: SUPABASE_URL/SUPABASE_ANON_KEY missing", http.StatusInternalServerError)
 		return
 	}
 
