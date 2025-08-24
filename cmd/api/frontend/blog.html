@@ -341,8 +341,8 @@
 
     function createBlogPost(post, index) {
         const formattedContent = parseMarkdown(post.data || '');
-        const postDate = formatDate(post.date);
-        const isoDate = post.date ? new Date(post.date).toISOString() : new Date().toISOString();
+        const postDate = formatDate(post.created_at);
+        const isoDate = post.created_at ? new Date(post.created_at).toISOString() : new Date().toISOString();
 
         return `
             <article class="blog-post" itemscope itemtype="https://schema.org/BlogPosting">
