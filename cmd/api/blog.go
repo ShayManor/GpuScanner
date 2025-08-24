@@ -9,11 +9,6 @@ import (
 	"strings"
 )
 
-type data struct {
-	body  string
-	title string
-}
-
 // Gets all blog posts and returns them
 func blogHandler(w http.ResponseWriter, r *http.Request) {
 	base := os.Getenv("SUPABASE_URL")
@@ -24,7 +19,7 @@ func blogHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	v := url.Values{}
-	v.Set("select", "title,data")
+	v.Set("select", "title,data,created_at")
 	// Adjust to your schema; if you track publish dates:
 	v.Set("order", "created_at.desc")
 
