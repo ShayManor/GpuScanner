@@ -47,6 +47,10 @@ definitions:
         type: integer
       reliability:
         type: number
+      score:
+        type: number
+      score_dollar_ph:
+        type: number
       source:
         description: e.g., "tensordock", "vast", etc.
         type: string
@@ -91,6 +95,10 @@ paths:
         in: query
         name: min_flopsd
         type: number
+      - description: Name of GPU (e.g. A100 SXM, RTX 4090)
+        in: query
+        name: name
+        type: string
       - default: updated_at.desc
         description: Column.direction (e.g., updated_at.desc)
         in: query

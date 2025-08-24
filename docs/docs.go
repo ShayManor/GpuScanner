@@ -52,6 +52,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "Name of GPU (e.g. A100 SXM, RTX 4090)",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "default": "updated_at.desc",
                         "description": "Column.direction (e.g., updated_at.desc)",
                         "name": "sort",
@@ -207,6 +213,12 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "reliability": {
+                    "type": "number"
+                },
+                "score": {
+                    "type": "number"
+                },
+                "score_dollar_ph": {
                     "type": "number"
                 },
                 "source": {
