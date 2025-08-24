@@ -1,7 +1,7 @@
 name: Create Blog Post
 on:
   schedule:
-    - cron: "0 * * * *"    # hourly
+    - cron: "0 0 * * *"    # daily
   push:
     branches:
       - main
