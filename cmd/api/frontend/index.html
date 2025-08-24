@@ -92,6 +92,104 @@
         }
         .stat-label { color: var(--muted); font-size: 14px; }
 
+        /* Featured GPUs Section */
+        .featured-gpus { margin: 60px 0; }
+        .section-title {
+            text-align: center; font-size: 32px; font-weight: 700;
+            margin: 0 0 16px;
+        }
+        .section-subtitle {
+            text-align: center; color: var(--muted); margin: 0 0 40px;
+            max-width: 600px; margin-left: auto; margin-right: auto;
+        }
+        .featured-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        .featured-card {
+            background: var(--elev); border: 1px solid #1f2430;
+            border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow);
+            position: relative; overflow: hidden;
+            cursor: pointer; transition: all .2s;
+            text-decoration: none; color: inherit;
+        }
+        .featured-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: #2a3441;
+        }
+        .featured-card::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0;
+            height: 4px; background: linear-gradient(90deg, var(--accent), #60a5fa);
+        }
+        .featured-card.researchers::before { background: linear-gradient(90deg, var(--ok), #34d399); }
+        .featured-card.students::before { background: linear-gradient(90deg, var(--warning), #fbbf24); }
+        .featured-card.hottest::before { background: linear-gradient(90deg, var(--danger), #f87171); }
+
+        .featured-header {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+        }
+        .featured-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .featured-card.researchers .featured-icon {
+            background: linear-gradient(135deg, var(--ok), #34d399);
+        }
+        .featured-card.students .featured-icon {
+            background: linear-gradient(135deg, var(--warning), #fbbf24);
+        }
+        .featured-card.hottest .featured-icon {
+            background: linear-gradient(135deg, var(--danger), #f87171);
+        }
+        .featured-title {
+            font-size: 18px; font-weight: 600; margin: 0;
+        }
+        .featured-subtitle {
+            color: var(--muted); font-size: 14px; margin: 0;
+        }
+
+        .gpu-info {
+            margin-bottom: 20px;
+        }
+        .gpu-name {
+            font-size: 20px; font-weight: 700; color: var(--text);
+            margin: 0 0 8px;
+        }
+        .gpu-provider {
+            color: var(--muted); font-size: 14px; margin: 0 0 12px;
+        }
+        .gpu-specs {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+        }
+        .spec-item {
+            background: var(--elev-2); border-radius: 8px; padding: 12px;
+            text-align: center;
+        }
+        .spec-value {
+            font-size: 18px; font-weight: 600; color: var(--accent);
+            display: block; margin-bottom: 4px;
+        }
+        .spec-label {
+            color: var(--muted); font-size: 12px; text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .loading-card {
+            display: flex; align-items: center; justify-content: center;
+            min-height: 200px; color: var(--muted);
+        }
+        .loading-spinner {
+            width: 20px; height: 20px; border: 2px solid var(--elev-2);
+            border-top: 2px solid var(--accent); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-right: 12px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* Features Grid */
         .features {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -112,10 +210,6 @@
 
         /* Providers Section */
         .providers { margin-bottom: 60px; }
-        .section-title {
-            text-align: center; font-size: 32px; font-weight: 700;
-            margin: 0 0 40px;
-        }
         .provider-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 16px; margin-top: 24px;
@@ -124,6 +218,12 @@
             background: var(--elev); border: 1px solid #1f2430;
             border-radius: 10px; padding: 16px; text-align: center;
             color: var(--muted); font-size: 14px; font-weight: 500;
+            text-decoration: none; display: block;
+            transition: all .2s; cursor: pointer;
+        }
+        .provider-badge:hover {
+            background: var(--elev-2); color: var(--text);
+            border-color: #2a3441; transform: translateY(-1px);
         }
 
         /* API Info */
@@ -162,6 +262,7 @@
             .cta-group { flex-direction: column; }
             .stats { grid-template-columns: repeat(2, 1fr); }
             .features { grid-template-columns: 1fr; }
+            .featured-grid { grid-template-columns: 1fr; }
             .footer-links { flex-direction: column; gap: 12px; }
         }
 
@@ -170,6 +271,7 @@
             header { margin-bottom: 40px; }
             .hero { margin-bottom: 60px; }
             .stats { grid-template-columns: 1fr; }
+            .gpu-specs { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -182,8 +284,9 @@
         </div>
         <nav>
             <a href="search.html">Search</a>
+            <a href="blog.html">Blog</a>
             <a href="about.html">About</a>
-            <a href="#api">API</a>
+            <a href="https://gpufindr.com/docs/index.html">API</a>
         </nav>
     </header>
 
@@ -215,21 +318,49 @@
         </div>
     </section>
 
+    <section class="featured-gpus">
+        <h2 class="section-title">Featured GPUs</h2>
+        <p class="section-subtitle">Top picks curated for different use cases based on performance, value, and availability.</p>
+
+        <div class="featured-grid">
+            <div class="featured-card researchers" id="researchers-card">
+                <div class="loading-card">
+                    <div class="loading-spinner"></div>
+                    Loading best GPU for researchers...
+                </div>
+            </div>
+
+            <div class="featured-card students" id="students-card">
+                <div class="loading-card">
+                    <div class="loading-spinner"></div>
+                    Loading best GPU for students...
+                </div>
+            </div>
+
+            <div class="featured-card hottest" id="hottest-card">
+                <div class="loading-card">
+                    <div class="loading-spinner"></div>
+                    Loading hottest GPU deal...
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="providers">
         <h2 class="section-title">Supported Providers</h2>
         <p style="text-align: center; color: var(--muted); margin-bottom: 32px;">
             We aggregate data from leading GPU cloud providers to give you comprehensive market coverage.
         </p>
         <div class="provider-grid">
-            <div class="provider-badge">CoreWeave</div>
-            <div class="provider-badge">Lambda Labs</div>
-            <div class="provider-badge">RunPod</div>
-            <div class="provider-badge">Vast.ai</div>
-            <div class="provider-badge">Tensordock</div>
-            <div class="provider-badge">Vultr</div>
-            <div class="provider-badge">AWS</div>
-            <div class="provider-badge">GCP</div>
-            <div class="provider-badge">Azure</div>
+            <a href="https://www.coreweave.com/" class="provider-badge" target="_blank" rel="noopener">CoreWeave</a>
+            <a href="https://lambdalabs.com/" class="provider-badge" target="_blank" rel="noopener">Lambda Labs</a>
+            <a href="https://www.runpod.io/" class="provider-badge" target="_blank" rel="noopener">RunPod</a>
+            <a href="https://vast.ai/" class="provider-badge" target="_blank" rel="noopener">Vast.ai</a>
+            <a href="https://www.tensordock.com/" class="provider-badge" target="_blank" rel="noopener">Tensordock</a>
+            <a href="https://www.vultr.com/" class="provider-badge" target="_blank" rel="noopener">Vultr</a>
+            <a href="https://aws.amazon.com/ec2/" class="provider-badge" target="_blank" rel="noopener">AWS</a>
+            <a href="https://cloud.google.com/compute" class="provider-badge" target="_blank" rel="noopener">GCP</a>
+            <a href="https://azure.microsoft.com/en-us/products/virtual-machines" class="provider-badge" target="_blank" rel="noopener">Azure</a>
         </div>
     </section>
 
@@ -242,16 +373,36 @@
         </div>
 
         <p style="margin-top: 20px;">
-            <a href="https://gpufindr.com/docs" style="color: var(--accent); text-decoration: none;">View full API documentation →</a>
+            <a href="https://gpufindr.com/docs/index.html" style="color: var(--accent); text-decoration: none;">View full API documentation →</a>
+        </p>
+    </section>
+
+    <section class="api-info">
+        <h3>MCP Server Integration</h3>
+        <p class="muted">Connect our GPU data directly to your AI tools and workflows using the Model Context Protocol (MCP). Real-time streaming updates with no authentication required.</p>
+
+        <div class="api-endpoint">
+            SSE: gpufindr.com/mcp/sse
+        </div>
+
+        <div class="api-features">
+            <div class="api-feature">Real-time GPU availability updates</div>
+            <div class="api-feature">Direct integration with Claude Desktop</div>
+            <div class="api-feature">No authentication or API keys needed</div>
+            <div class="api-feature">Server-sent events for live data</div>
+        </div>
+
+        <p style="margin-top: 20px;">
+            <a href="https://docs.anthropic.com/en/docs/build-with-claude/mcp" style="color: var(--accent); text-decoration: none;">Learn more about MCP →</a>
         </p>
     </section>
 
     <footer>
         <div class="footer-links">
             <a href="search.html">Search GPUs</a>
-            <a href="about.html">API Docs</a>
-            <a href="mailto:contact@gpufindr.com">Contact</a>
-            <a href="#" onclick="return false;">Privacy</a>
+            <a href="about.html">More Info</a>
+            <a href="https://gpufindr.com/docs/index.html">API Documentation</a>
+            <a href="mailto:shay.manor@gmail.com">Contact</a>
         </div>
         <p style="font-size: 14px; margin: 0;">
             GPU Finder - Compare cloud GPU hosting prices across providers
@@ -299,6 +450,141 @@
         console.error('Error fetching GPU data:', err);
         document.getElementById('stat-providers').textContent = '—';
         document.getElementById('stat-locations').textContent = '—';
+    });
+
+    // Helper function to create GPU card content
+    function createGPUCard(gpu, category) {
+        const categoryInfo = {
+            researchers: { icon: '🔬', title: 'Best for Researchers', subtitle: 'Highest performance score' },
+            students: { icon: '🎓', title: 'Best for Students', subtitle: 'Best value under $2/hour' },
+            hottest: { icon: '🔥', title: 'Hottest Deal', subtitle: 'Best price-performance ratio' }
+        };
+
+        const info = categoryInfo[category];
+        const hasUrl = gpu.url && gpu.url.trim();
+
+        const cardContent = `
+            <div class="featured-header">
+                <div class="featured-icon">${info.icon}</div>
+                <div>
+                    <div class="featured-title">${info.title}</div>
+                    <div class="featured-subtitle">${info.subtitle}</div>
+                </div>
+            </div>
+            <div class="gpu-info">
+                <div class="gpu-name">${gpu.name || 'Unknown GPU'}</div>
+                <div class="gpu-provider">${gpu.source || 'Unknown Provider'} • ${gpu.location || 'Unknown Location'}</div>
+                <div class="gpu-specs">
+                    <div class="spec-item">
+                        <span class="spec-value">${(gpu.gpu_cost_ph || 0).toFixed(2)}</span>
+                        <div class="spec-label">Per Hour</div>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-value">${(gpu.score || 0).toFixed(1)}</span>
+                        <div class="spec-label">Score</div>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-value">${gpu.vram_mb / 1024 || 'N/A'}</span>
+                        <div class="spec-label">VRAM (GB)</div>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-value">${(gpu.score_dollar_ph || 0).toFixed(1)}</span>
+                        <div class="spec-label">Value Score</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return {
+            content: cardContent,
+            url: hasUrl ? gpu.url : null
+        };
+    }
+
+    // Load featured GPUs
+    fetch(API + '?limit=10000&sort=score.desc')
+        .then(r => {
+        if (!r.ok) throw new Error('Network response was not ok');
+    return r.json();
+    })
+    .then(gpus => {
+        console.log('GPU data for featured section:', gpus.slice(0, 5));
+
+        // Filter valid GPUs with required fields
+        const validGPUs = gpus.filter(gpu =>
+            gpu.score !== null && gpu.score !== undefined &&
+            gpu.gpu_cost_ph !== null && gpu.gpu_cost_ph !== undefined &&
+            gpu.score_dollar_ph !== null && gpu.score_dollar_ph !== undefined
+    );
+
+    console.log('Valid GPUs found:', validGPUs.length);
+
+    // Best GPU for researchers (highest score)
+    const bestResearcher = validGPUs.reduce((best, current) =>
+    (current.score > best.score) ? current : best
+    );
+
+    // Best GPU for students (highest score under $2/hour)
+    const studentGPUs = validGPUs.filter(gpu => gpu.gpu_cost_ph < 2);
+    const bestStudent = studentGPUs.length > 0 ?
+        studentGPUs.reduce((best, current) =>
+        (current.score > best.score) ? current : best
+    ) : null;
+
+    // Hottest GPU (highest score_dollar_ph where cost >= $1)
+    const hottestGPUs = validGPUs.filter(gpu => gpu.gpu_cost_ph >= 1);
+    const hottestGPU = hottestGPUs.length > 0 ?
+        hottestGPUs.reduce((best, current) =>
+        (current.score_dollar_ph > best.score_dollar_ph) ? current : best
+    ) : null;
+
+    // Update cards
+    if (bestResearcher) {
+        const researcherCard = createGPUCard(bestResearcher, 'researchers');
+        const researcherCardElement = document.getElementById('researchers-card');
+        researcherCardElement.innerHTML = researcherCard.content;
+        if (researcherCard.url) {
+            researcherCardElement.onclick = () => window.open(researcherCard.url, '_blank');
+        }
+    } else {
+        document.getElementById('researchers-card').innerHTML =
+            '<div class="loading-card">No data available</div>';
+    }
+
+    if (bestStudent) {
+        const studentCard = createGPUCard(bestStudent, 'students');
+        const studentCardElement = document.getElementById('students-card');
+        studentCardElement.innerHTML = studentCard.content;
+        if (studentCard.url) {
+            studentCardElement.onclick = () => window.open(studentCard.url, '_blank');
+        }
+    } else {
+        document.getElementById('students-card').innerHTML =
+            '<div class="loading-card">No student-friendly GPUs found</div>';
+    }
+
+    if (hottestGPU) {
+        const hottestCard = createGPUCard(hottestGPU, 'hottest');
+        const hottestCardElement = document.getElementById('hottest-card');
+        hottestCardElement.innerHTML = hottestCard.content;
+        if (hottestCard.url) {
+            hottestCardElement.onclick = () => window.open(hottestCard.url, '_blank');
+        }
+    } else {
+        document.getElementById('hottest-card').innerHTML =
+            '<div class="loading-card">No hot deals found</div>';
+    }
+
+    console.log('Featured GPUs:', { bestResearcher, bestStudent, hottestGPU });
+    })
+    .catch(err => {
+        console.error('Error fetching featured GPU data:', err);
+
+        // Show error state
+        const errorContent = '<div class="loading-card">Unable to load GPU data</div>';
+        document.getElementById('researchers-card').innerHTML = errorContent;
+        document.getElementById('students-card').innerHTML = errorContent;
+        document.getElementById('hottest-card').innerHTML = errorContent;
     });
 </script>
 <script type="module">
