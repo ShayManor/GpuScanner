@@ -124,6 +124,9 @@ func tensordockGetter() ([]GPU, error) {
 			}
 			totalFlops, memBWGBs, name := gpuSpecs(g.V0Name)
 			totalFlops = totalFlops / 1e12
+			if g.PricePerHr == 0 {
+				continue
+			}
 			newGpu := GPU{
 				_Id:         hn.ID,
 				Location:    loc,
@@ -154,7 +157,7 @@ func tensordockGetter() ([]GPU, error) {
 				// To keep semantics consistent with Vast, we set totalCostPH to GPU price here.
 				TotalCostPH:      g.PricePerHr,
 				GpuCostPH:        g.PricePerHr,
-				DiskCostPH:       g.PricePerHr, // per-GB rate exists, but we avoid mixing units here
+				DiskCostPH:       0, // per-GB rate exists, but we avoid mixing units here
 				UploadCostPH:     0,
 				DownloadCostPH:   0,
 				FlopsPerDollarPH: totalFlops / g.PricePerHr,
@@ -166,6 +169,9 @@ func tensordockGetter() ([]GPU, error) {
 			out = append(out, newGpu)
 
 		}
+	}
+	for gpu := range out {
+		fmt.Println(out[gpu].toString())
 	}
 
 	fmt.Printf("Found %d TensorDock GPUs\n", len(out))
