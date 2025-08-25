@@ -53,7 +53,6 @@ type offer struct {
 
 func fetchVastOffers(limit int) ([]offer, error) {
 	body := fmt.Sprintf(`{"q":{"limit":%d,"rentable":"true"}}`, limit)
-	fmt.Println(string(body))
 	req, _ := http.NewRequest("PUT", "https://console.vast.ai/api/v0/search/asks/", strings.NewReader(body))
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
