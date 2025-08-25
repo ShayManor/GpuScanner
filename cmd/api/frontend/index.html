@@ -456,7 +456,7 @@
     function createGPUCard(gpu, category) {
         const categoryInfo = {
             researchers: { icon: '🔬', title: 'Best for Researchers', subtitle: 'Highest performance score' },
-            students: { icon: '🎓', title: 'Best for Students', subtitle: 'Best value under $2/hour' },
+            students: { icon: '🎓', title: 'Best for Students', subtitle: 'Best value under $0.5/hour' },
             hottest: { icon: '🔥', title: 'Hottest Deal', subtitle: 'Best price-performance ratio' }
         };
 
@@ -472,7 +472,7 @@
                 </div>
             </div>
             <div class="gpu-info">
-                <div class="gpu-name">${gpu.name || 'Unknown GPU'}</div>
+                <div class="gpu-name">${gpu.num_gpus && gpu.num_gpus > 1 ? `${gpu.num_gpus} x ${gpu.name}` : gpu.name || 'Unknown GPU'}</div>
                 <div class="gpu-provider">${gpu.source || 'Unknown Provider'} • ${gpu.location || 'Unknown Location'}</div>
                 <div class="gpu-specs">
                     <div class="spec-item">
@@ -480,8 +480,8 @@
                         <div class="spec-label">Per Hour</div>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-value">${(gpu.score || 0).toFixed(1)}</span>
-                        <div class="spec-label">Score</div>
+                        <span class="spec-value">${(gpu.cpu_cores || 0).toFixed(1)}</span>
+                        <div class="spec-label">CPU</div>
                     </div>
                     <div class="spec-item">
                         <span class="spec-value">${gpu.vram_mb / 1024 || 'N/A'}</span>
@@ -524,8 +524,8 @@
     (current.score > best.score) ? current : best
     );
 
-    // Best GPU for students (highest score under $2/hour)
-    const studentGPUs = validGPUs.filter(gpu => gpu.gpu_cost_ph < 2);
+    // Best GPU for students (highest score under $1/hour)
+    const studentGPUs = validGPUs.filter(gpu => gpu.gpu_cost_ph < 0.5);
     const bestStudent = studentGPUs.length > 0 ?
         studentGPUs.reduce((best, current) =>
         (current.score > best.score) ? current : best
