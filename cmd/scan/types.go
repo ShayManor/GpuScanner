@@ -187,6 +187,11 @@ func gpuSpecs(displayName string) (flops float64, memBWGBs float64, name string)
 		return 5760e12, 8000, "GB200"
 	}
 
+	// B300 (Blackwell Ultra)
+	if has("b300") {
+		return 3300e12, 8000, "B300"
+	}
+
 	// B200 (Blackwell) — public FP32/BW still in flux
 	if has("b200") || has("B200") {
 		return 2200e12, 8000, "B200"
@@ -228,6 +233,10 @@ func gpuSpecs(displayName string) (flops float64, memBWGBs float64, name string)
 		return 19.2e12, 448, "RTX A4000"
 	case has("rtx a2000", "rtxa2000", "a2000"):
 		return 8e12, 288, "RTX A2000"
+
+	// Blackwell "RTX PRO" naming; must precede the Ada "pro 6000" case below
+	case has("pro 6000 blackwell", "pro6000 blackwell"):
+		return 125e12, 1792, "RTX PRO 6000 Blackwell"
 
 	// Ada “Pro RTX” naming used by some marketplaces
 	case has("6000 ada", "rtx 6000 ada", "pro 6000", "pro6000"):

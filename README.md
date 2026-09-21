@@ -7,7 +7,7 @@ https://gpufindr.com
 ## Overview
 
 GpuScanner is a multi-component Go application that:
-- Scans and monitors GPU resources across cloud providers (AWS Lambda, RunPod, TensorDock, Vast.ai)
+- Scans and monitors GPU resources across cloud providers (AWS Lambda, Lium, RunPod, TensorDock, Vast.ai)
 - Provides a web API and frontend for GPU search and monitoring
 - Automatically generates and publishes blog content about GPU market trends
 - Integrates with MCP (Model Context Protocol) for AI-powered interactions
@@ -24,7 +24,7 @@ The project is organized into several key components:
 
 ### Key Features
 
-- **Multi-Provider GPU Scanning**: Monitors GPU availability across Lambda, RunPod, TensorDock, and Vast.ai
+- **Multi-Provider GPU Scanning**: Monitors GPU availability across Lambda, Lium, RunPod, TensorDock, and Vast.ai
 - **REST API**: Provides endpoints for GPU data retrieval and search
 - **Web Frontend**: HTML interface for searching and viewing GPU information
 - **Automated Blogging**: Daily blog post generation using AI
@@ -34,6 +34,7 @@ The project is organized into several key components:
 
 ### GPU Scanning (`cmd/scan/`)
 - `lambdaGetter.go` - AWS Lambda GPU monitoring
+- `liumGetter.go` - Lium public nodes feed
 - `runpodGetter.go` - RunPod GPU tracking
 - `tensordockGetter.go` - TensorDock integration
 - `vastGetter.go` - Vast.ai monitoring

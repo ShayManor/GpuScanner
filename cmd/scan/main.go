@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	getters := []Getter{lambdaGetter, vastGetter, tensordockGetter, runpodGetter}
+	getters := []Getter{lambdaGetter, vastGetter, tensordockGetter, runpodGetter, liumGetter}
 
 	var rows []GPU
 	for _, getter := range getters {
@@ -29,8 +29,8 @@ func main() {
 	base := os.Getenv("SUPABASE_URL") + "/rest/v1/gpus"
 	key := os.Getenv("SUPABASE_SERVICE_KEY")
 
-	// 1) DELETE only rows we manage: source in (lambda, vast, tensordock, runpod)
-	sources := []string{"lambda", "vast", "tensordock", "runpod"}
+	// 1) DELETE only rows we manage: source in (lambda, vast, tensordock, runpod, lium)
+	sources := []string{"lambda", "vast", "tensordock", "runpod", "lium"}
 	q := url.Values{}
 	q.Set("source", "in.("+strings.Join(sources, ",")+")") // URL-encodes () as %28 %29
 	delURL := base + "?" + q.Encode()
