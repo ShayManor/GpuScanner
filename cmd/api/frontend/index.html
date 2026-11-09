@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GPU Finder - Compare GPU Cloud Hosting Prices</title>
+    <title>GPU Finder</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233b82f6'/%3E%3Ctext x='16' y='21.5' text-anchor='middle' font-family='system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif' font-size='15' font-weight='700' fill='white'%3EGF%3C/text%3E%3C/svg%3E" />
     <meta name="description" content="Find the best GPU hosting deals across multiple cloud providers. Compare prices, performance, and availability for AI/ML workloads." />
     <style>
         :root {
@@ -225,6 +226,16 @@
             background: var(--elev-2); color: var(--text);
             border-color: #2a3441; transform: translateY(-1px);
         }
+        .provider-details summary {
+            list-style: none; cursor: pointer; width: fit-content; margin: 0 auto;
+            padding: 10px 18px; border-radius: 10px; border: 1px solid #1f2430;
+            background: var(--elev); color: var(--accent); font-weight: 600;
+            transition: background .2s;
+        }
+        .provider-details summary::-webkit-details-marker { display: none; }
+        .provider-details summary:hover { background: var(--elev-2); }
+        .provider-details summary::after { content: "\25BE"; display: inline-block; margin-left: 8px; transition: transform .2s; }
+        .provider-details[open] summary::after { transform: rotate(180deg); }
 
         /* API Info */
         .api-info {
@@ -351,6 +362,8 @@
         <p style="text-align: center; color: var(--muted); margin-bottom: 32px;">
             We aggregate data from leading GPU cloud providers to give you comprehensive market coverage.
         </p>
+        <details class="provider-details">
+        <summary>Show all providers</summary>
         <div class="provider-grid">
             <a href="https://www.coreweave.com/" class="provider-badge" target="_blank" rel="noopener">CoreWeave</a>
             <a href="https://lambdalabs.com/" class="provider-badge" target="_blank" rel="noopener">Lambda Labs</a>
@@ -362,12 +375,21 @@
             <a href="https://aws.amazon.com/ec2/" class="provider-badge" target="_blank" rel="noopener">AWS</a>
             <a href="https://cloud.google.com/compute" class="provider-badge" target="_blank" rel="noopener">GCP</a>
             <a href="https://azure.microsoft.com/en-us/products/virtual-machines" class="provider-badge" target="_blank" rel="noopener">Azure</a>
+            <a href="https://www.runcrate.ai/pricing?utm_source=gpufindr&utm_medium=directory&utm_campaign=gpu_pricing" class="provider-badge" target="_blank" rel="noopener">Runcrate</a>
+            <a href="https://akash.network/" class="provider-badge" target="_blank" rel="noopener">Akash</a>
+            <a href="https://nosana.com/" class="provider-badge" target="_blank" rel="noopener">Nosana</a>
+            <a href="https://www.thetaedgecloud.com/" class="provider-badge" target="_blank" rel="noopener">Theta EdgeCloud</a>
+            <a href="https://verda.com/" class="provider-badge" target="_blank" rel="noopener">Verda</a>
+            <a href="https://www.linode.com/" class="provider-badge" target="_blank" rel="noopener">Akamai Cloud (Linode)</a>
+            <a href="https://www.koyeb.com/" class="provider-badge" target="_blank" rel="noopener">Koyeb</a>
+            <a href="https://www.cudocompute.com/" class="provider-badge" target="_blank" rel="noopener">Cudo Compute</a>
         </div>
+        </details>
     </section>
 
     <section class="api-info" id="api">
         <h3>Free API Access</h3>
-        <p class="muted">Access our data programmatically with our simple REST API. No authentication required, no rate limits for reasonable usage.</p>
+        <p class="muted">Access our data programmatically with our simple REST API.</p>
 
         <div class="api-endpoint">
             GET https://gpufindr.com/gpus
@@ -380,17 +402,10 @@
 
     <section class="api-info">
         <h3>MCP Server Integration</h3>
-        <p class="muted">Connect our GPU data directly to your AI tools and workflows using the Model Context Protocol (MCP). Real-time streaming updates with no authentication required.</p>
+        <p class="muted">Connect our GPU data directly to your AI tools and workflows using the Model Context Protocol (MCP).</p>
 
         <div class="api-endpoint">
             SSE: gpufindr.com/mcp/sse
-        </div>
-
-        <div class="api-features">
-            <div class="api-feature">Real-time GPU availability updates</div>
-            <div class="api-feature">Direct integration with Claude Desktop</div>
-            <div class="api-feature">No authentication or API keys needed</div>
-            <div class="api-feature">Server-sent events for live data</div>
         </div>
 
         <p style="margin-top: 20px;">
@@ -444,7 +459,7 @@
     console.log('Providers found:', Array.from(providers)); // Debug log
     console.log('Locations found:', Array.from(locations)); // Debug log
 
-    document.getElementById('stat-providers').textContent = 9;
+    document.getElementById('stat-providers').textContent = 14;
     document.getElementById('stat-locations').textContent = locations.size.toLocaleString();
     })
     .catch(err => {

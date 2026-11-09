@@ -21,6 +21,8 @@ type Search struct {
 
 type offer struct {
 	ID               int     `json:"machine_id"`
+	AskID            int     `json:"id"`
+	Dph              float64 `json:"dph_total"`
 	GPUName          string  `json:"gpu_name"`
 	CPUCores         float64 `json:"cpu_cores_effective"`
 	NumGPUs          int     `json:"num_gpus"`
@@ -51,9 +53,26 @@ type offer struct {
 	Search           Search  `json:"search"`
 }
 
-func fetchVastOffers(limit int) ([]offer, error) {
-	body := fmt.Sprintf(`{"q":{"limit":%d,"rentable":"true"}}`, limit)
-	req, _ := http.NewRequest("PUT", "https://console.vast.ai/api/v0/search/asks/", strings.NewReader(body))
+var vastSearchURL = "https://console.vast.ai/api/v0/search/asks/"
+
+// The endpoint caps every query at 64 rows whatever limit asks for, so breadth
+// comes from walking the price order rather than from a bigger limit.
+const (
+	vastPageSize = 64
+	vastMaxPages = 40
+)
+
+// A negative cursor asks for the cheapest page; otherwise the page starts at cursor.
+func vastSearchBody(limit int, cursor float64) string {
+	if cursor < 0 {
+		return fmt.Sprintf(`{"q":{"limit":%d,"rentable":{"eq":true},"order":[["dph_total","asc"]]}}`, limit)
+	}
+	return fmt.Sprintf(`{"q":{"limit":%d,"rentable":{"eq":true},"order":[["dph_total","asc"]],"dph_total":{"gte":%v}}}`, limit, cursor)
+}
+
+func fetchVastOffersPage(cursor float64) ([]offer, error) {
+	body := vastSearchBody(vastPageSize, cursor)
+	req, _ := http.NewRequest("PUT", vastSearchURL, strings.NewReader(body))
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
@@ -61,11 +80,54 @@ func fetchVastOffers(limit int) ([]offer, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode/100 != 2 {
+		return nil, fmt.Errorf("vast API status %s", resp.Status)
+	}
 	var sr Response
 	if err := json.NewDecoder(resp.Body).Decode(&sr); err != nil {
 		return nil, err
 	}
 	return sr.Offers, nil
+}
+
+// fetchVastOffers walks the marketplace in ascending price, using the last price
+// of each page as the next page's lower bound, until a short page ends the walk
+// or maxPages is spent. Pages overlap on tied prices, so offers are kept by id.
+func fetchVastOffers(maxPages int) ([]offer, error) {
+	out := make([]offer, 0, maxPages*vastPageSize)
+	seen := make(map[int]bool, maxPages*vastPageSize)
+	cursor := -1.0
+
+	for page := 0; page < maxPages; page++ {
+		offers, err := fetchVastOffersPage(cursor)
+		if err != nil {
+			return nil, err
+		}
+
+		maxDph := cursor
+		added := 0
+		for _, o := range offers {
+			if o.Dph > maxDph {
+				maxDph = o.Dph
+			}
+			if seen[o.AskID] {
+				continue
+			}
+			seen[o.AskID] = true
+			out = append(out, o)
+			added++
+		}
+
+		if len(offers) < vastPageSize {
+			break
+		}
+		if maxDph <= cursor || added == 0 {
+			// A whole page priced at the cursor: step past it so the walk moves.
+			maxDph = math.Nextafter(cursor, math.Inf(1))
+		}
+		cursor = maxDph
+	}
+	return out, nil
 }
 
 func isAllDigits(s string) bool {
@@ -155,7 +217,7 @@ func convertGPUNameToURLFormat(gpuName string) string {
 }
 
 func vastGetter() ([]GPU, error) {
-	sr, err := fetchVastOffers(4096)
+	sr, err := fetchVastOffers(vastMaxPages)
 	if err != nil {
 		return nil, err
 	}
