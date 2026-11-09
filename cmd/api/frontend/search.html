@@ -350,7 +350,7 @@
             case 'ram_gb': return fmtGB(r.ram_mb);
             case 'score': return toPrecision(r.score)
             case 'score_dollar_ph': return toPrecision(r.score_dollar_ph)
-            case 'reliability': return isFiniteNum(r.reliability)? (r.reliability*100).toFixed(0)+'%':'—';
+            case 'reliability': return isFiniteNum(r.reliability)&&r.reliability>0? (r.reliability*100).toFixed(0)+'%':'—';
             case 'upload_gbps': return fmtGbps(r.upload_mbps);
             case 'download_gbps': return fmtGbps(r.download_mbps);
             case 'total_cost_ph': return fmtMoney(r.total_cost_ph);

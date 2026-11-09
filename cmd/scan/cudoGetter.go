@@ -63,6 +63,7 @@ func parseCudo(r io.Reader) ([]GPU, error) {
 			Location: m.DataCenterID,
 
 			Name:              name,
+			Vram:              standardVramGB[name] * 1024, // the feed has no VRAM
 			TotalFlops:        totalFlops,
 			GpuMemoryBandwith: memBWGBs,
 			NumGPUs:           1,

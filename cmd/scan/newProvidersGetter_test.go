@@ -93,7 +93,7 @@ func TestParseNosana(t *testing.T) {
 	if !approx(six.TotalCostPH, 13.2) || !approx(six.GpuCostPH, 2.2) {
 		t.Errorf("6x prices = %v/%v, want 13.2 total incl. 10%% fee and 2.2 per GPU", six.TotalCostPH, six.GpuCostPH)
 	}
-	if a4.Name != "RTX A4000" || a4.NumGPUs != 1 || a4.Vram != 0 {
+	if a4.Name != "RTX A4000" || a4.NumGPUs != 1 || a4.Vram != 16*1024 { // no metadata: the A4000's only size
 		t.Errorf("A4000 market = %s x%d %dMB", a4.Name, a4.NumGPUs, a4.Vram)
 	}
 	if six.Url != "https://dashboard.nosana.com/markets/addr6x" || six.Source != "nosana" {

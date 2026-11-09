@@ -96,6 +96,8 @@ func azureRows(best map[string]azurePriceItem) []GPU {
 		newGpu := GPU{
 			_Id:      sku,
 			Location: it.Location,
+			// Azure's SLA for a single VM on Premium SSD.
+			Reliability: 0.999,
 
 			Name:              name,
 			Vram:              size.VramGB * 1024,

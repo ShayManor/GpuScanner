@@ -283,6 +283,19 @@ func proBlackwellName(name string) string {
 	return name
 }
 
+// standardVramGB is the per-GPU VRAM of cards that ship in a single memory size,
+// keyed by the names gpuSpecs returns. Feeds that omit VRAM fall back to it;
+// cards sold in several sizes (A100, B200, V100, ...) are left out on purpose.
+var standardVramGB = map[string]int{
+	"RTX 5090": 32, "rtx 5080": 16, "RTX 4090": 24, "RTX 4080": 16, "RTX 4070": 12,
+	"RTX 3090": 24, "RTX 3080 ti": 12, "RTX 3080": 10, "RTX 3070": 8,
+	"H100 SXM": 80, "H100 PCIE": 80, "H200": 141,
+	"l40s": 48, "l40": 48, "l4": 24, "a10": 24, "a30": 24, "a40": 48, "t4": 16,
+	"RTX a6000": 48, "RTX A5000": 24, "RTX A4500": 20, "RTX A4000": 16,
+	"RTX PRO 6000 Blackwell": 96, "RTX 6000 ada pro": 48, "RTX 4000 ada": 20, "RTX 2000 ada": 16,
+	"mi300x": 192,
+}
+
 // calculateScore returns a 0..100 score focused on hardware capability and stability.
 // Only these fields are considered: NumGPUs, VRAM, TotalFlops, GpuMemoryBandwith,
 // CpuCores, Ram, Reliability.

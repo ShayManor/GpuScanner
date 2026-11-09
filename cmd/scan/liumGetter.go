@@ -64,6 +64,9 @@ func parseLiumNodes(r io.Reader) ([]GPU, error) {
 		}
 		totalFlops, memBWGBs, name := gpuSpecs(n.GPUModel)
 		totalFlops = float64(n.GPUCount) * totalFlops / 1e12
+		if name == "unknown" {
+			name = n.GPUModel // keep the feed's model name rather than "unknown"
+		}
 
 		newGpu := GPU{
 			_Id:         n.ID,

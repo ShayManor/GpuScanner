@@ -48,6 +48,9 @@ func TestParseLinode(t *testing.T) {
 	if g.Name != "RTX 4000 ada" || g.NumGPUs != 2 || g.Ram != 65536 || g.DiskSpace != 1024 {
 		t.Errorf("got %s x%d ram %dMB disk %vGB", g.Name, g.NumGPUs, g.Ram, g.DiskSpace)
 	}
+	if g.Vram != 20*1024 || g.Reliability != 0.9999 {
+		t.Errorf("vram/reliability = %dMB/%v, want 20GB from the RTX 4000 Ada and Akamai's 99.99%% SLA", g.Vram, g.Reliability)
+	}
 	if !approx(g.GpuCostPH, 0.67) || g.Source != "linode" {
 		t.Errorf("gpu price/source = %v/%q", g.GpuCostPH, g.Source)
 	}
@@ -99,7 +102,7 @@ func TestParseCudo(t *testing.T) {
 	}
 	g := gpus[0]
 	// 2 vCPUs at most 0.5 vCPU per GiB need 4 GiB: 0.87 + 2*0.0049 + 4*0.0049.
-	if g.Name != "l40s" || g.CpuCores != 2 || g.Ram != 4*1024 {
+	if g.Name != "l40s" || g.CpuCores != 2 || g.Ram != 4*1024 || g.Vram != 48*1024 {
 		t.Errorf("got %s cpu %v ram %dMB", g.Name, g.CpuCores, g.Ram)
 	}
 	if !approx(g.TotalCostPH, 0.87+6*0.0049) || !approx(g.GpuCostPH, 0.87) || g.Location != "no-kristiansand-1" {
@@ -123,6 +126,9 @@ func TestCheapestAzurePricesSkipsSpotWindowsAndEdgeZones(t *testing.T) {
 	if !approx(g.TotalCostPH, 0.526) || g.Location != "US East 2" {
 		t.Errorf("picked $%v in %q, want $0.526 in US East 2", g.TotalCostPH, g.Location)
 	}
+	if g.Reliability != 0.999 {
+		t.Errorf("reliability = %v, want Azure's 99.9%% single-VM SLA", g.Reliability)
+	}
 	if g.Name != "t4" || g.NumGPUs != 1 || g.Vram != 16*1024 || g.Source != "azure" {
 		t.Errorf("got %s x%d %dMB %q", g.Name, g.NumGPUs, g.Vram, g.Source)
 	}
@@ -132,6 +138,45 @@ func TestAzureSizesAllMapToKnownGPUs(t *testing.T) {
 	for sku, size := range azureGPUSizes {
 		if _, _, name := gpuSpecs(size.GPU); name == "unknown" {
 			t.Errorf("%s: gpuSpecs(%q) is unknown", sku, size.GPU)
+		}
+	}
+}
+
+func TestNosanaVramFromMarketName(t *testing.T) {
+	const fx = `[{"address":"a","slug":"nvidia-a100-80gb-community","name":"NVIDIA A100 80GB Community","type":"COMMUNITY",
+  "usd_reward_per_hour":0.61364,"network_fee_percentage":10,"client":false,"metadata":[]}]`
+	gpus, err := parseNosana(strings.NewReader(fx))
+	if err != nil || len(gpus) != 1 {
+		t.Fatalf("rows=%d err=%v", len(gpus), err)
+	}
+	if gpus[0].Vram != 80*1024 {
+		t.Errorf("Vram = %dMB, want 80GB from the market name", gpus[0].Vram)
+	}
+}
+
+func TestParseLiumNodesKeepsFeedNameForUnknownGPU(t *testing.T) {
+	const fx = `{"nodes":[{"id":"n1","gpu_model":"RTX 5070 Ti","gpu_count":1,"available_gpu_count":1,
+  "gpu_memory_gb":16,"price_per_gpu_hour":0.2,"price_per_node_hour":0.2}]}`
+	gpus, err := parseLiumNodes(strings.NewReader(fx))
+	if err != nil || len(gpus) != 1 {
+		t.Fatalf("rows=%d err=%v", len(gpus), err)
+	}
+	if gpus[0].Name != "RTX 5070 Ti" {
+		t.Errorf("Name = %q, want the feed's model name", gpus[0].Name)
+	}
+}
+
+func TestStandardVramKeysAreGpuSpecsNames(t *testing.T) {
+	known := map[string]bool{}
+	for _, probe := range []string{"RTX 5090", "RTX 5080", "RTX 4090", "RTX 4080", "RTX 4070", "RTX 3090", "RTX 3080 Ti", "RTX 3080",
+		"RTX 3070", "H100 SXM", "H100 PCIe", "H200", "L40S", "L40", "L4", "A10", "A30", "A40", "T4", "RTX A6000", "RTX A5000",
+		"RTX A4500", "RTX A4000", "RTX PRO 6000 Blackwell", "RTX 6000 Ada", "RTX 4000 Ada", "RTX 2000 Ada", "MI300X"} {
+		_, _, name := gpuSpecs(probe)
+		known[name] = true
+	}
+	for name := range standardVramGB {
+		if !known[name] {
+			t.Errorf("standardVramGB key %q is not a name gpuSpecs returns", name)
 		}
 	}
 }

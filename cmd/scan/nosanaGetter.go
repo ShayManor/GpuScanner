@@ -41,14 +41,19 @@ func nosanaGPUCount(name string) int {
 	return 1
 }
 
-func nosanaVramGB(m nosanaMarket) int {
+// nosanaVramGB returns the whole market's VRAM: from metadata, else from a size
+// in the market name ("NVIDIA A100 80GB Community"), else the card's only size.
+func nosanaVramGB(m nosanaMarket, num int, name string) int {
 	for _, kv := range m.Metadata {
 		if kv.Key == "vram" {
 			v, _ := strconv.Atoi(strings.TrimSuffix(strings.TrimSpace(kv.Value), "GB"))
 			return v
 		}
 	}
-	return 0
+	if gb := parseVRAMMB(m.Name) / 1024; gb > 0 {
+		return gb * num
+	}
+	return standardVramGB[name] * num
 }
 
 func parseNosana(r io.Reader) ([]GPU, error) {
@@ -74,7 +79,7 @@ func parseNosana(r io.Reader) ([]GPU, error) {
 			_Id: m.Slug,
 
 			Name:              name,
-			Vram:              nosanaVramGB(m) / num * 1024,
+			Vram:              nosanaVramGB(m, num, name) / num * 1024,
 			TotalFlops:        totalFlops,
 			GpuMemoryBandwith: memBWGBs,
 			NumGPUs:           num,

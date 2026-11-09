@@ -48,7 +48,10 @@ func parseLinode(r io.Reader) ([]GPU, error) {
 		newGpu := GPU{
 			_Id: t.ID,
 
+			Reliability: 0.9999, // Akamai's compute SLA, which covers GPU plans
+
 			Name:              name,
+			Vram:              standardVramGB[name] * 1024, // the feed has no VRAM
 			TotalFlops:        totalFlops,
 			GpuMemoryBandwith: memBWGBs,
 			NumGPUs:           t.GPUs,
