@@ -213,7 +213,7 @@ func gpuSpecs(displayName string) (flops float64, memBWGBs float64, name string)
 		return 31.2e12, 600, "a10"
 	case has("a30"):
 		return 10.3e12, 933, "a30"
-	case has("a40"):
+	case has("a40") && !has("a4000"):
 		return 37.4e12, 696, "a40"
 	}
 
@@ -270,6 +270,17 @@ func gpuSpecs(displayName string) (flops float64, memBWGBs float64, name string)
 
 	// Fallback: unknown
 	return 0, 0, "unknown"
+}
+
+// proBlackwellName maps marketplace spellings of the RTX PRO 6000 ("RTXPro6000",
+// "pro6000se", "Pro 6000 (WE)") onto the Blackwell entry of gpuSpecs; the Ada
+// card is always spelled with "ada" in these feeds.
+func proBlackwellName(name string) string {
+	n := strings.NewReplacer(" ", "", "-", "", "_", "").Replace(strings.ToLower(name))
+	if strings.Contains(n, "pro6000") && !strings.Contains(n, "ada") {
+		return "RTX PRO 6000 Blackwell"
+	}
+	return name
 }
 
 // calculateScore returns a 0..100 score focused on hardware capability and stability.
