@@ -1,0 +1,6 @@
+[Unit]
+Description=GPU Finder scan (only when idle or 2h stale)
+
+[Service]
+Type=oneshot
+ExecStart=%h/gpuscanner/deploy/minipc/scan-when-idle.sh

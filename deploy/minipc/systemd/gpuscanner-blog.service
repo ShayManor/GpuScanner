@@ -1,0 +1,6 @@
+[Unit]
+Description=GPU Finder daily blog post
+
+[Service]
+Type=oneshot
+ExecStart=%h/gpuscanner/deploy/minipc/compose.sh run --rm blog

@@ -60,7 +60,7 @@ type Count struct {
 }
 
 var (
-	supabaseURL = "https://eteavfeiumodbjywzqfa.supabase.co"
+	supabaseURL = mustEnv("SUPABASE_URL")
 	anonKey     = mustEnv("SUPABASE_ANON_KEY")
 	httpc       = &http.Client{Timeout: 10 * time.Second}
 )

@@ -1,0 +1,9 @@
+[Unit]
+Description=Check every 30 minutes whether to scan GPU prices
+
+[Timer]
+OnCalendar=*:00,30
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,83 @@
+# GPU Finder on the mini PC: Postgres + PostgREST in place of Supabase, the
+# API/website, and the scan and blog jobs (run by systemd user timers).
+# Always run through ./compose.sh, which loads ~/.config/gpuscanner/env.
+name: gpuscanner
+
+x-app: &app
+  image: gpuscanner:latest
+  build:
+    context: ../..
+    dockerfile: deploy/minipc/Dockerfile
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: gpuscanner
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      AUTHENTICATOR_PASSWORD: ${AUTHENTICATOR_PASSWORD:?}
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./initdb.sh:/docker-entrypoint-initdb.d/initdb.sh:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "gpuscanner"]
+      interval: 10s
+      retries: 5
+
+  postgrest:
+    image: postgrest/postgrest:v12.2.3
+    restart: unless-stopped
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${AUTHENTICATOR_PASSWORD:?}@db:5432/gpuscanner
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: web_anon
+      PGRST_DB_MAX_ROWS: 1000 # Supabase's default cap
+      PGRST_JWT_SECRET: ${JWT_SECRET:?}
+    depends_on:
+      db: { condition: service_healthy }
+
+  # The Go code calls $SUPABASE_URL/rest/v1/<table>; this strips the prefix.
+  rest:
+    image: caddy:2.8.4-alpine
+    restart: unless-stopped
+    command: ["caddy", "run", "--adapter", "caddyfile", "--config", "/etc/caddy/Caddyfile"]
+    volumes:
+      - ./rest.Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on: [postgrest]
+
+  api:
+    <<: *app
+    restart: unless-stopped
+    environment:
+      SUPABASE_URL: http://rest:3000
+      SUPABASE_ANON_KEY: ${ANON_JWT:?}
+    ports:
+      - "127.0.0.1:5080:8080"
+    depends_on: [rest]
+
+  scan:
+    <<: *app
+    profiles: [jobs]
+    command: ["/app/scan"]
+    environment:
+      SUPABASE_URL: http://rest:3000
+      SUPABASE_SERVICE_KEY: ${SERVICE_JWT:?}
+      TENSORDOCK_TOKEN: ${TENSORDOCK_TOKEN:-}
+      RUNPOD_API_KEY: ${RUNPOD_API_KEY:-}
+      LAMBDA_TOKEN: ${LAMBDA_TOKEN:-}
+    depends_on: [rest]
+
+  blog:
+    <<: *app
+    profiles: [jobs]
+    command: ["/app/blog"]
+    environment:
+      SUPABASE_URL: http://rest:3000
+      SUPABASE_SERVICE_KEY: ${SERVICE_JWT:?}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    depends_on: [rest]
+
+volumes:
+  db:
