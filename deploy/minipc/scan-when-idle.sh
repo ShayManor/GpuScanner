@@ -17,4 +17,4 @@ if [ $((now - last)) -lt 7200 ] && [ "$busy" -ge 30 ]; then
 fi
 
 echo "scan: CPU ${busy}% busy, last scan $(((now - last) / 60)) min ago"
-"$(dirname "$(readlink -f "$0")")/compose.sh" run --rm scan && echo "$now" >"$STAMP"
+"$(dirname "$(readlink -f "$0")")/run-job.sh" scan && echo "$now" >"$STAMP"
