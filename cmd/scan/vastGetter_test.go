@@ -17,6 +17,7 @@ func TestVastSearchBodyFiltersWithOperatorDict(t *testing.T) {
 		Q struct {
 			Limit    int             `json:"limit"`
 			Rentable json.RawMessage `json:"rentable"`
+			Verified json.RawMessage `json:"verified"`
 		} `json:"q"`
 	}
 	if err := json.Unmarshal([]byte(vastSearchBody(4096, -1)), &body); err != nil {
@@ -28,6 +29,9 @@ func TestVastSearchBodyFiltersWithOperatorDict(t *testing.T) {
 	}
 	if got := strings.TrimSpace(string(body.Q.Rentable)); got != `{"eq":true}` {
 		t.Errorf("rentable = %s, want {\"eq\":true}", got)
+	}
+	if got := strings.TrimSpace(string(body.Q.Verified)); got != `{"eq":true}` {
+		t.Errorf("verified = %s, want {\"eq\":true}", got)
 	}
 }
 

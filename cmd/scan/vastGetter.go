@@ -63,11 +63,13 @@ const (
 )
 
 // A negative cursor asks for the cheapest page; otherwise the page starts at cursor.
+// Only verified machines are asked for: Vast's console hides unverified and
+// deverified ones, so their offers could not be found from a link.
 func vastSearchBody(limit int, cursor float64) string {
 	if cursor < 0 {
-		return fmt.Sprintf(`{"q":{"limit":%d,"rentable":{"eq":true},"order":[["dph_total","asc"]]}}`, limit)
+		return fmt.Sprintf(`{"q":{"limit":%d,"rentable":{"eq":true},"verified":{"eq":true},"order":[["dph_total","asc"]]}}`, limit)
 	}
-	return fmt.Sprintf(`{"q":{"limit":%d,"rentable":{"eq":true},"order":[["dph_total","asc"]],"dph_total":{"gte":%v}}}`, limit, cursor)
+	return fmt.Sprintf(`{"q":{"limit":%d,"rentable":{"eq":true},"verified":{"eq":true},"order":[["dph_total","asc"]],"dph_total":{"gte":%v}}}`, limit, cursor)
 }
 
 func fetchVastOffersPage(cursor float64) ([]offer, error) {

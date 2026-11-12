@@ -53,7 +53,7 @@ func writeArticle(topic string) string {
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage(getWritePrompt(topic)),
 		},
-		Model: openai.ChatModelGPT5ChatLatest,
+		Model: "gpt-5.4",
 	})
 	if err != nil {
 		panic(err.Error())
@@ -69,7 +69,7 @@ func getTitle(data string) string {
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage(getTitlePrompt(data)),
 		},
-		Model: openai.ChatModelGPT5ChatLatest,
+		Model: "gpt-5.4",
 	})
 	if err != nil {
 		panic(err.Error())
@@ -91,7 +91,7 @@ func getTopic() string {
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage(getTopicPrompt()),
 		},
-		Model:       openai.ChatModelGPT5ChatLatest,
+		Model:       "gpt-5.4",
 		Temperature: temp,
 		TopP:        topP,
 		N:           N,
